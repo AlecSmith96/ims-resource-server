@@ -12,7 +12,6 @@ import java.util.List;
 
 
 @RestController
-
 public class ProductController
 {
     @Autowired
@@ -27,7 +26,7 @@ public class ProductController
     @GetMapping("/products")
     public List<Product> getProducts()
     {
-        log.info("Entered getProducts method");
+        log.info("Retrieving all products from database..");
         List<Product> all = productRepository.findAll();
 
         return all;

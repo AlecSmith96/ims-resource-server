@@ -14,6 +14,7 @@ public class Product
     private Integer id;
     private String name;
     private Integer sku;
+    private Float price;
     private Integer inventory_on_hand;
     private Integer reorder_threshold;
 }

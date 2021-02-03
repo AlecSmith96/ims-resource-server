@@ -36,6 +36,7 @@ public class OrderController
     @GetMapping("/orders/product/{product_id}")
     public List<Order> getOrdersForProduct(@PathVariable int product_id) throws Exception
     {
+        log.info("Searching for orders by product...");
         Optional<Product> product = productRepository.findById(product_id);
         if (product.isPresent())
         {

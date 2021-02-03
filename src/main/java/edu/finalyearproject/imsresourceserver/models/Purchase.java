@@ -10,10 +10,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "purchases")
 @Data
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Order
+public class Purchase
 {
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -21,17 +21,17 @@ public class Order
 
     @JsonManagedReference
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="customer_id", nullable=false)
-    private Customer customer;
+    @JoinColumn(name="supplier_id", nullable=false)
+    private Supplier supplier;
 
-    private Date order_date;
+    private Date purchase_date;
 
     private Date arrival_date;
 
-    @ManyToMany(/*mappedBy = "orders",*/ cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
-            name = "order_items",
-            joinColumns = @JoinColumn(name = "order_id"),
+            name = "purchase_items",
+            joinColumns = @JoinColumn(name = "purchase_id"),
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
     private Set<Product> products = new HashSet<>();

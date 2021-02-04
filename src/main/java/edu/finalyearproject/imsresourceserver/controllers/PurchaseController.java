@@ -25,6 +25,12 @@ public class PurchaseController
 
     private Logger log = LoggerFactory.getLogger(PurchaseController.class);
 
+    @GetMapping("/purchases/all")
+    public List<Purchase> getPurchases()
+    {
+        return purchaseRepository.findAll();
+    }
+
     @GetMapping("/purchases/product/{product_id}")
     public List<Purchase> getPurchasesForProduct(@PathVariable int product_id) throws Exception
     {

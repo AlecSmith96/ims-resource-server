@@ -24,9 +24,9 @@ public class Order
     @JoinColumn(name="customer_id", nullable=false)
     private Customer customer;
 
-    private Date order_date;
+    private String order_date;
 
-    private Date arrival_date;
+    private String arrival_date;
 
     @ManyToMany(/*mappedBy = "orders",*/ cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(

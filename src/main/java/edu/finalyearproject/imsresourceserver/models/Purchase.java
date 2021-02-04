@@ -24,9 +24,9 @@ public class Purchase
     @JoinColumn(name="supplier_id", nullable=false)
     private Supplier supplier;
 
-    private Date purchase_date;
+    private String purchase_date;
 
-    private Date arrival_date;
+    private String arrival_date;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(

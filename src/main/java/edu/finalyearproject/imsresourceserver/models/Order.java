@@ -35,4 +35,18 @@ public class Order
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
     private Set<Product> products = new HashSet<>();
+
+    @Transient
+    private Float totalCost;
+
+    public Float getTotalCost()
+    {
+        Float totalCost = Float.valueOf(0);
+        for (Product product : products)
+        {
+            totalCost += product.getPrice();
+        }
+
+        return totalCost;
+    }
 }

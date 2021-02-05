@@ -28,7 +28,7 @@ public class Order
 
     private String arrival_date;
 
-    @ManyToMany(/*mappedBy = "orders",*/ cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
             name = "order_items",
             joinColumns = @JoinColumn(name = "order_id"),

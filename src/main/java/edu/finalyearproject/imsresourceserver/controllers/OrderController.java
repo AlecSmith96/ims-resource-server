@@ -10,8 +10,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.http.HttpResponse;
+import java.sql.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +33,10 @@ public class OrderController
 
     private Logger log = LoggerFactory.getLogger(OrderController.class);
 
+    /**
+     * GET method for returning all orders in the order repository.
+     * @return List<Order> - List containing POJOs of all order records.
+     */
     @GetMapping("/orders/all")
     public List<Order> getOrders()
     {
@@ -36,6 +45,24 @@ public class OrderController
         return all;
     }
 
+    /**
+     * POST method for setting an orders arrival date to todays date.
+     * @param id - the id(primary key) of the order to set to delivered.
+     * @return void
+     */
+    @PostMapping("/order/delivered/{id}")
+    public void setOrderToDelivered(@PathVariable int id)
+    {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime now = LocalDateTime.now();
+        Date date = Date.valueOf(dtf.format(now));
+
+        Order order = orderRepository.findByid(id);
+        order.setArrival_date(date);
+        orderRepository.save(order);
+    }
+
+    // NOT USED CURRENTLY //////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Method that returns all orders in format that can be used in the table of the 'Customer Orders' page.
      * @return List<OrderPageOrders> - All orders in correct format for order table
@@ -67,6 +94,12 @@ public class OrderController
         return newOrder;
     }
 
+    /**
+     * GET method for returning all orders containing a specific product.
+     * @param product_id - the id(primary key) of the product.
+     * @return List<Order> - List of Orders that contain that product.
+     * @throws Exception - If the product isn't found in the product repository.
+     */
     @GetMapping("/orders/product/{product_id}")
     public List<Order> getOrdersForProduct(@PathVariable int product_id) throws Exception
     {

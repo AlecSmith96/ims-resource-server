@@ -6,6 +6,8 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,6 +17,9 @@ import java.util.Set;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Order
 {
+    @Transient
+    public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd-MM-yyyy");
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
@@ -24,9 +29,9 @@ public class Order
     @JoinColumn(name="customer_id", nullable=false)
     private Customer customer;
 
-    private String order_date;
+    private Date order_date;
 
-    private String arrival_date;
+    private Date arrival_date;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
@@ -39,14 +44,31 @@ public class Order
     @Transient
     private Float totalCost;
 
-    public Float getTotalCost()
+    public String getOrder_date()
     {
+        return DATE_FORMATTER.format(order_date);
+    }
+
+    public String getArrival_date()
+    {
+        if (arrival_date == null)
+        {
+            return "null";
+        }
+        return DATE_FORMATTER.format(arrival_date);
+    }
+
+    public String getTotalCost()
+    {
+        DecimalFormat df = new DecimalFormat();
+        df.setMaximumFractionDigits(2);
         Float totalCost = Float.valueOf(0);
+
         for (Product product : products)
         {
             totalCost += product.getPrice();
         }
 
-        return totalCost;
+        return df.format(totalCost);
     }
 }

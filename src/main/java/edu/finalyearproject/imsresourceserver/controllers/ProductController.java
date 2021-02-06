@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -30,6 +31,17 @@ public class ProductController
         List<Product> all = productRepository.findAll();
 
         return all;
+    }
+
+    /**
+     * GET method to return the names of all products in the database.
+     * @return List<String> - List of product names.
+     */
+    @GetMapping("/products/all-names")
+    public List<String> getProductNames()
+    {
+        List<Product> products = productRepository.findAll();
+        return products.stream().map(Product::getName).collect(Collectors.toList());
     }
 
     /**

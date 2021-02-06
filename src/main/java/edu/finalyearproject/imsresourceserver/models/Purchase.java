@@ -6,6 +6,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,6 +16,9 @@ import java.util.Set;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Purchase
 {
+    @Transient
+    public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd-MM-yyyy");
+
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
@@ -24,9 +28,9 @@ public class Purchase
     @JoinColumn(name="supplier_id", nullable=false)
     private Supplier supplier;
 
-    private String purchase_date;
+    private Date purchase_date;
 
-    private String arrival_date;
+    private Date arrival_date;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
@@ -35,4 +39,18 @@ public class Purchase
             inverseJoinColumns = @JoinColumn(name = "product_id")
     )
     private Set<Product> products = new HashSet<>();
+
+    public String getPurchase_date()
+    {
+        return DATE_FORMATTER.format(purchase_date);
+    }
+
+    public String getArrival_date()
+    {
+        if (arrival_date == null)
+        {
+            return "null";
+        }
+        return DATE_FORMATTER.format(arrival_date);
+    }
 }

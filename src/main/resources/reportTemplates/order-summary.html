@@ -9,24 +9,34 @@
     <title>Orders Summary</title>
 </head>
 <body>
-    <h5>Orders Summary Report</h5>
-    <table class="table">
-        <thead>
-        <tr>
-            <th> Order # </th>
-            <th> Ordered On </th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:if="${orders.empty}">
-            <td colspan="2"> No Orders Available </td>
-        </tr>
-        <tr th:each="order : ${orders}">
-            <td><span th:text="${order.id}"> Title </span></td>
-            <td><span th:text="${order.order_date}"> Author </span></td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="container">
+        <div style="text-align: center;"><h5>Orders Summary Report</h5></div>
+        <div class="col-md-10">
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th> Order # </th>
+                    <th> Customer </th>
+                    <th> Ordered On </th>
+                    <th> Status </th>
+                    <th> Delivered On </th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${orders.empty}">
+                    <td colspan="2"> No Orders Available </td>
+                </tr>
+                <tr th:each="order : ${orders}">
+                    <td><span th:text="${order.id}"> Id </span></td>
+                    <td><span th:text="${order.customer.title} + ' ' + ${order.customer.first_name} + ' ' + ${order.customer.last_name}"> Customer </span></td>
+                    <td><span th:text="${order.order_date}"> Order Date </span></td>
+                    <td><span th:text="${order.arrival_date} == null ? 'PENDING' : 'DELIVERED'"> Order Date </span></td>
+                    <td><span th:text="${order.arrival_date} == null ? 'N/A' : ${order.arrival_date}"> Order Date </span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </body>
 </html>
 <!-- JQuery -->

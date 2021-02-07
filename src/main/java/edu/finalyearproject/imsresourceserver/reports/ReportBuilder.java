@@ -1,11 +1,14 @@
 package edu.finalyearproject.imsresourceserver.reports;
 
+import com.lowagie.text.DocumentException;
 import edu.finalyearproject.imsresourceserver.models.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+import org.xhtmlrenderer.pdf.ITextRenderer;
 
+import java.io.*;
 import java.util.List;
 import java.util.Locale;
 
@@ -60,17 +63,34 @@ public class ReportBuilder
     }
 
     /**
-     * Builder method for returning the HTML String of the generated report.
+     * Builder return method for returning the HTML String of the generated report.
      * @param templateName - the name of the HTML template to pass the context to.
      * @return String - the generated HTML String of the report.
      */
     public String buildReport(String templateName)
     {
-        return templateEngine.process("order-summary.html", context);
+        return templateEngine.process(templateName, context);
     }
 
-    public void writeReportToFile()
+    public void buildHtmlFile(String templateName, String fileName) throws IOException
     {
+        String html = templateEngine.process(templateName, context);
 
+        BufferedWriter fileWriter = new BufferedWriter(new FileWriter(System.getProperty("user.home") + File.separator + fileName));
+        fileWriter.write(html);
+        fileWriter.close();
+    }
+
+    public static void generatePdfFromHtml(String html, String fileName) throws DocumentException, IOException
+    {
+        String outputFolder = System.getProperty("user.home") + File.separator + fileName;
+        OutputStream outputStream = new FileOutputStream(outputFolder);
+
+        ITextRenderer renderer = new ITextRenderer();
+        renderer.setDocumentFromString(html);
+        renderer.layout();
+        renderer.createPDF(outputStream);
+
+        outputStream.close();
     }
 }

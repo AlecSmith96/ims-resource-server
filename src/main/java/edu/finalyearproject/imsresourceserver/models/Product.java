@@ -1,9 +1,6 @@
 package edu.finalyearproject.imsresourceserver.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.ObjectIdGenerator;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -25,4 +22,10 @@ public class Product
     private Float price;
     private Integer inventory_on_hand;
     private Integer reorder_threshold;
+    private Integer reorder_quantity;
+
+    @JsonManagedReference
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name="supplier_id", nullable=false)
+    private Supplier supplier;
 }

@@ -2,10 +2,13 @@ package edu.finalyearproject.imsresourceserver.controllers;
 
 
 import edu.finalyearproject.imsresourceserver.models.Product;
+import edu.finalyearproject.imsresourceserver.models.Supplier;
 import edu.finalyearproject.imsresourceserver.repositories.ProductRepository;
+import edu.finalyearproject.imsresourceserver.repositories.SupplierRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,6 +20,9 @@ public class ProductController
 {
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private SupplierRepository supplierRepository;
 
     private Logger log = LoggerFactory.getLogger(ProductController.class);
 
@@ -64,6 +70,18 @@ public class ProductController
     public Product getProductBySku(@PathVariable Integer sku)
     {
         return productRepository.findBysku(sku);
+    }
+
+    /**
+     * Returns all products for a given supplier.
+     * @param name - the name of the supplier to find the products of
+     * @return List<Product> - List of all products provided by the supplier.
+     */
+    @GetMapping("/products/supplier/{name}")
+    public List<Product> getProductsForSupplier(@PathVariable String name)
+    {
+        Supplier supplier = supplierRepository.findByname(name);
+        return productRepository.findBysupplier(supplier);
     }
 
     /**

@@ -8,4 +8,6 @@ import java.util.List;
 public interface SupplierRepository extends CrudRepository<Supplier, Integer>
 {
     List<Supplier> findAll();
+
+    Supplier findByname(String name);
 }

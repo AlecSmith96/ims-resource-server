@@ -3,21 +3,23 @@ package edu.finalyearproject.imsresourceserver.controllers;
 import edu.finalyearproject.imsresourceserver.models.Order;
 import edu.finalyearproject.imsresourceserver.models.Product;
 import edu.finalyearproject.imsresourceserver.models.Purchase;
+import edu.finalyearproject.imsresourceserver.models.Supplier;
 import edu.finalyearproject.imsresourceserver.repositories.ProductRepository;
 import edu.finalyearproject.imsresourceserver.repositories.PurchaseRepository;
+import edu.finalyearproject.imsresourceserver.repositories.SupplierRepository;
+import edu.finalyearproject.imsresourceserver.requests.PurchaseOrderRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 public class PurchaseController
@@ -27,6 +29,9 @@ public class PurchaseController
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private SupplierRepository supplierRepository;
 
     private Logger log = LoggerFactory.getLogger(PurchaseController.class);
 
@@ -62,6 +67,23 @@ public class PurchaseController
 
         Purchase purchase = purchaseRepository.findByid(id);
         purchase.setArrival_date(date);
+        purchaseRepository.save(purchase);
+    }
+
+    @PostMapping("/purchase/create")
+    public void createPurchaseOrder(@RequestBody PurchaseOrderRequest orderRequest)
+    {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime now = LocalDateTime.now();
+        Date date = Date.valueOf(dtf.format(now));
+        Supplier supplier = supplierRepository.findByname(orderRequest.getSupplier());
+        Set<Product> products = orderRequest.getProducts().stream().map(productItem ->
+                productRepository.findByname(productItem.getValue())).collect(Collectors.toSet());
+
+        Purchase purchase = new Purchase();
+        purchase.setSupplier(supplier);
+        purchase.setPurchase_date(date);
+        purchase.setProducts(products);
         purchaseRepository.save(purchase);
     }
 }

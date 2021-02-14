@@ -14,4 +14,7 @@ public interface PurchaseRepository extends CrudRepository<Purchase, Integer>
     Purchase findByid(int id);
     List<Purchase> findBysupplier(int supplier_id);
     List<Purchase> findByproducts(Product product);
+
+    @Override
+    <S extends Purchase> S save(S s);
 }

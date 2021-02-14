@@ -40,6 +40,18 @@ public class Purchase
     )
     private Set<Product> products = new HashSet<>();
 
+    public Purchase()
+    {
+
+    }
+
+    public Purchase(Supplier supplier, Date date, Set<Product> products)
+    {
+        this.supplier = supplier;
+        this.purchase_date = date;
+        this.products = products;
+    }
+
     public String getPurchase_date()
     {
         return DATE_FORMATTER.format(purchase_date);

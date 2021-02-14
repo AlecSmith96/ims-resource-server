@@ -4,6 +4,7 @@ import edu.finalyearproject.imsresourceserver.models.Order;
 import edu.finalyearproject.imsresourceserver.models.Product;
 import edu.finalyearproject.imsresourceserver.models.Purchase;
 import edu.finalyearproject.imsresourceserver.models.Supplier;
+import edu.finalyearproject.imsresourceserver.reports.ReportBuilder;
 import edu.finalyearproject.imsresourceserver.repositories.ProductRepository;
 import edu.finalyearproject.imsresourceserver.repositories.PurchaseRepository;
 import edu.finalyearproject.imsresourceserver.repositories.SupplierRepository;
@@ -11,6 +12,10 @@ import edu.finalyearproject.imsresourceserver.requests.PurchaseOrderRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
@@ -32,6 +37,9 @@ public class PurchaseController
 
     @Autowired
     private SupplierRepository supplierRepository;
+
+    @Autowired
+    private ReportBuilder reportBuilder;
 
     private Logger log = LoggerFactory.getLogger(PurchaseController.class);
 
@@ -67,11 +75,30 @@ public class PurchaseController
 
         Purchase purchase = purchaseRepository.findByid(id);
         purchase.setArrival_date(date);
+
+        // UPDATE product quantities
+
         purchaseRepository.save(purchase);
     }
 
+    /**
+     * POST method to create a new purchase order and return HTML invoice for it.
+     * @param orderRequest - form data containing supplier name and list of product names.
+     * @return HttpEntity - HTTP response containing invoice in body and necessary headers.
+     */
     @PostMapping("/purchase/create")
-    public void createPurchaseOrder(@RequestBody PurchaseOrderRequest orderRequest)
+    public HttpEntity<String> createPurchaseOrder(@RequestBody PurchaseOrderRequest orderRequest)
+    {
+        Purchase purchase = createPurchaseRecord(orderRequest);
+        purchaseRepository.save(purchase);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Type", "text/html");
+        headers.add("Content-Disposition", "attachment; purchase_invoice.html");
+
+        return ResponseEntity.ok().headers(headers).body(generatePurchaseInvoice(purchase));
+    }
+
+    private Purchase createPurchaseRecord(@RequestBody PurchaseOrderRequest orderRequest)
     {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDateTime now = LocalDateTime.now();
@@ -80,10 +107,19 @@ public class PurchaseController
         Set<Product> products = orderRequest.getProducts().stream().map(productItem ->
                 productRepository.findByname(productItem.getValue())).collect(Collectors.toSet());
 
-        Purchase purchase = new Purchase();
-        purchase.setSupplier(supplier);
-        purchase.setPurchase_date(date);
-        purchase.setProducts(products);
-        purchaseRepository.save(purchase);
+        return new Purchase(supplier, date, products);
+    }
+
+    private String generatePurchaseInvoice(Purchase purchase)
+    {
+        String status = purchase.getArrival_date().equals("null") ? "PENDING" : "DELIVERED";
+        return reportBuilder.withContext()
+                    .withProductList("products", purchase.getProducts())
+                    .withString("id", purchase.getId().toString())
+                    .withString("supplier", purchase.getSupplier().getName())
+                    .withString("purchase_date", purchase.getPurchase_date())
+                    .withString("status", status)
+                    .withString("arrival_date", purchase.getArrival_date())
+                    .buildReport("supplier-invoice");
     }
 }

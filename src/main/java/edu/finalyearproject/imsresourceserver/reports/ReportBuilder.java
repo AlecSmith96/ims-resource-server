@@ -2,6 +2,7 @@ package edu.finalyearproject.imsresourceserver.reports;
 
 import com.lowagie.text.DocumentException;
 import edu.finalyearproject.imsresourceserver.models.Order;
+import edu.finalyearproject.imsresourceserver.models.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
@@ -11,6 +12,7 @@ import org.xhtmlrenderer.pdf.ITextRenderer;
 import java.io.*;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Builder class to set context and generate HTML reports based on data and HTML template passed to it.
@@ -46,6 +48,19 @@ public class ReportBuilder
     public ReportBuilder withOrdersList(String listName, List<Order> orders)
     {
         context.setVariable(listName, orders);
+
+        return this;
+    }
+
+    /**
+     * Builder method for adding a List of Product objects to the context.
+     * @param listName - the variable name of the list.
+     * @param products - the list of Product objects.
+     * @return ReportBuilder - the current instance of the builder.
+     */
+    public ReportBuilder withProductList(String listName, Set<Product> products)
+    {
+        context.setVariable(listName, products);
 
         return this;
     }

@@ -1,10 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.10/css/mdb.min.css" rel="stylesheet"/>
+    <title>Purchase Order Invoice</title>
 </head>
 <body>
-
+<div class="container col-md-10">
+    <div style="text-align: center;">
+        <h5>Purchase Order #<span th:text="${id}">id</span> Invoice </h5>
+    </div>
+    <div class="container jumbotron">
+        <p>Ordered on: <span th:text="${purchase_date}">purchase date</span></p>
+        <p>Status: <span th:text="${status}">status</span></p>
+        <p>Supplier: <span th:text="${supplier}">supplier name</span></p>
+    </div>
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th> Product # </th>
+            <th> Name </th>
+            <th> Sku </th>
+            <th> Amount Ordered </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${products.empty}">
+            <td colspan="2"> No Products Ordered </td>
+        </tr>
+        <tr th:each="product : ${products}">
+            <td><span th:text="${product.id}"> Id </span></td>
+            <td><span th:text="${product.name}"> Name </span></td>
+            <td><span th:text="${product.sku}"> Sku </span></td>
+            <td><span th:text="${product.reorder_quantity}"> Order Date </span></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

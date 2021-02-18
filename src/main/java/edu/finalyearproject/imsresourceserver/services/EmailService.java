@@ -42,20 +42,21 @@ public class EmailService
      * @param body - the text body of the email
      * @param report - the HTML report to attach as a file to the email
      * @param filename - the name of the created HTML file containing the report
+     * @param date - the date the report was generated
      */
-    public void sendEmailWithAttachment(String recipient, String subject, String body, String report, String filename)
+    public void sendEmailWithAttachment(String recipient, String subject, String body, String report, String filename, String date)
     {
         log.info("Sending email with HTML report to "+ recipient);
         File file = null;
         try
         {
-            file = createFileToAttach(report, filename);
+            file = createFileToAttach(report, filename+"-"+date);
         } catch (IOException e)
         {
             log.error("Unable to create HTML file locally: "+e);
         }
 
-        MimeMessagePreparator preparator = generateEmail(recipient, subject, body, filename, file);
+        MimeMessagePreparator preparator = generateEmail(recipient, subject, body, filename, file, date);
 
         try
         {
@@ -69,7 +70,7 @@ public class EmailService
         file.delete();
     }
 
-    private MimeMessagePreparator generateEmail(String recipient, String subject, String body, String filename, File file)
+    private MimeMessagePreparator generateEmail(String recipient, String subject, String body, String filename, File file, String date)
     {
         return mimeMessage ->
             {
@@ -81,7 +82,7 @@ public class EmailService
 
                 FileSystemResource fileSystemResource = new FileSystemResource(file);
                 MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
-                helper.setText("Example");
+                helper.setText("Here is your Order Summary Report for "+date);
                 helper.addAttachment(filename+".html", fileSystemResource, "text/html");
             };
     }

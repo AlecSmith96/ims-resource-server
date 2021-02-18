@@ -4,6 +4,7 @@ import com.lowagie.text.DocumentException;
 import edu.finalyearproject.imsresourceserver.models.Order;
 import edu.finalyearproject.imsresourceserver.reports.ReportBuilder;
 import edu.finalyearproject.imsresourceserver.repositories.OrderRepository;
+import edu.finalyearproject.imsresourceserver.services.EmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,9 @@ public class ReportsController
     private OrderRepository orderRepository;
 
     @Autowired
+    private EmailService emailService;
+
+    @Autowired
     private ReportBuilder reportBuilder;
 
     private Logger log = LoggerFactory.getLogger(PurchaseController.class);
@@ -29,12 +33,12 @@ public class ReportsController
     {
         log.info("Generating Order Summary Report...");
         List<Order> orders = orderRepository.findAll();
-        reportBuilder.withContext()
+        String html = reportBuilder.withContext()
                             .withOrdersList("orders", orders)
-                            .buildHtmlFile("order-summary", "order-summary.html");
-//                            .buildReport("order-summary");
-//        ReportBuilder.generatePdfFromHtml(html, "order-summary.pdf");
+                            .buildReport("order-summary");
 
-        return reportBuilder.buildReport("order-summary");
+        emailService.sendEmailWithAttachment("rcsmith.alec@gmail.com", "order summary", "Test email", html, "order-summary");
+
+        return html;
     }
 }

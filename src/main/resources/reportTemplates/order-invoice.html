@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.10/css/mdb.min.css" rel="stylesheet"/>
+    <title>Order Invoice</title>
+</head>
+<body>
+<div class="container">
+    <div style="text-align: center;">
+        <h5>Order #<span th:text="${orderNumber}">orderNumber</span> Invoice</h5>
+    </div>
+    <div class="container jumbotron">
+        <div class="row">
+            <div class="col">
+                <p>Delivery Address</p>
+                <address>
+                    <span th:text="${houseNum}">houseNum</span> <span th:text="${line1}">line1</span><br/>
+                    <span th:text="${city}">city</span><br/>
+                    <span th:text="${county}">county</span><br/>
+                    <span th:text="${postCode}">postCode</span><br>
+                </address>
+            </div>
+            <div class="col text-right">
+                <p>Ordered on: <span th:text="${order_date}">order date</span></p>
+                <p>Status: <span th:text="${status}">status</span></p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-10">
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th> Product # </th>
+                <th> Name </th>
+                <th> Price </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${products.empty}">
+                <td colspan="3"> No Products Available </td>
+            </tr>
+            <tr th:each="product : ${products}">
+                <td><span th:text="${product.id}"> Id </span></td>
+                <td><span th:text="${product.name}"> Product Name </span></td>
+                <td class="text-right"><span th:text="${product.price}"> Product Price </span></td>
+            </tr>
+            <tr class="table-info">
+                <td class="text-right" colspan="2">Total Cost:</td>
+                <td class="text-right"><span th:text="${totalCost}">Cost</span></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

@@ -2,6 +2,7 @@ package edu.finalyearproject.imsresourceserver.controllers;
 
 import com.lowagie.text.DocumentException;
 import edu.finalyearproject.imsresourceserver.models.Order;
+import edu.finalyearproject.imsresourceserver.models.Purchase;
 import edu.finalyearproject.imsresourceserver.reports.ReportBuilder;
 import edu.finalyearproject.imsresourceserver.repositories.OrderRepository;
 import edu.finalyearproject.imsresourceserver.services.EmailService;
@@ -9,6 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -45,8 +48,47 @@ public class ReportsController
                             .withString("todaysDate", dtf.format(now))
                             .buildReport("order-summary");
 
-        emailService.sendEmailWithAttachment("rcsmith.alec@gmail.com", "order summary", "Test email", html, "order-summary", dtf.format(now));
+        emailService.sendEmailWithAttachment("rcsmith.alec@gmail.com", "order summary", "Here is your Order Summary Report for "+dtf.format(now), html, "order-summary", dtf.format(now));
 
         return html;
+    }
+
+    @GetMapping("/reports/order-invoice/{id}")
+    public String generateOrderInvoice(@PathVariable int id)
+    {
+        log.info("Generating invoice for order #"+id);
+        Order order = orderRepository.findByid(id);
+        String status = order.getArrival_date().equals("null") ? "PENDING" : "DELIVERED";
+
+        String html = reportBuilder.withContext()
+                            .withString("orderNumber", String.valueOf(id))
+                            .withString("order_date", order.getOrder_date())
+                            .withString("status", status)
+                            .withString("houseNum", String.valueOf(order.getCustomer().getAddress().getHouse_number()))
+                            .withString("line1", order.getCustomer().getAddress().getLine_1())
+                            .withString("city", order.getCustomer().getAddress().getCity())
+                            .withString("county", order.getCustomer().getAddress().getCounty())
+                            .withString("postCode", order.getCustomer().getAddress().getPost_code())
+                            .withProductList("products", order.getProducts())
+                            .withString("totalCost", order.getTotalCost())
+                            .buildReport("order-invoice");
+
+        emailService.sendEmailWithAttachment(order.getCustomer().getEmail(), "Order Confirmation", "Here is your invoice for your order on  "+order.getOrder_date(), html, "order-invoice", order.getOrder_date());
+
+        return html;
+    }
+
+    @GetMapping("/reports/supplier-invoice")
+    public String generatePurchaseInvoice(@RequestBody Purchase purchase)
+    {
+        String status = purchase.getArrival_date().equals("null") ? "PENDING" : "DELIVERED";
+        return reportBuilder.withContext()
+                .withProductList("products", purchase.getProducts())
+                .withString("id", purchase.getId().toString())
+                .withString("supplier", purchase.getSupplier().getName())
+                .withString("purchase_date", purchase.getPurchase_date())
+                .withString("status", status)
+                .withString("arrival_date", purchase.getArrival_date())
+                .buildReport("supplier-invoice");
     }
 }

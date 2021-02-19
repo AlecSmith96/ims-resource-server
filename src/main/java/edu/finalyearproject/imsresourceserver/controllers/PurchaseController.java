@@ -1,6 +1,5 @@
 package edu.finalyearproject.imsresourceserver.controllers;
 
-import edu.finalyearproject.imsresourceserver.models.Order;
 import edu.finalyearproject.imsresourceserver.models.Product;
 import edu.finalyearproject.imsresourceserver.models.Purchase;
 import edu.finalyearproject.imsresourceserver.models.Supplier;
@@ -12,9 +11,7 @@ import edu.finalyearproject.imsresourceserver.requests.PurchaseOrderRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,7 +36,7 @@ public class PurchaseController
     private SupplierRepository supplierRepository;
 
     @Autowired
-    private ReportBuilder reportBuilder;
+    private ReportsController reportsController;
 
     private Logger log = LoggerFactory.getLogger(PurchaseController.class);
 
@@ -69,6 +66,7 @@ public class PurchaseController
     @PostMapping("/purchase/delivered/{id}")
     public void setOrderToDelivered(@PathVariable int id)
     {
+        log.info("Setting purchase order " + id + " to delivered..");
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDateTime now = LocalDateTime.now();
         Date date = Date.valueOf(dtf.format(now));
@@ -87,15 +85,16 @@ public class PurchaseController
      * @return HttpEntity - HTTP response containing invoice in body and necessary headers.
      */
     @PostMapping("/purchase/create")
-    public HttpEntity<String> createPurchaseOrder(@RequestBody PurchaseOrderRequest orderRequest)
+    public ResponseEntity<String> createPurchaseOrder(@RequestBody PurchaseOrderRequest orderRequest)
     {
+        log.info("Creating purchase order for supplier: "+orderRequest.getSupplier());
         Purchase purchase = createPurchaseRecord(orderRequest);
         purchaseRepository.save(purchase);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "text/html");
-        headers.add("Content-Disposition", "attachment; purchase_invoice.html");
+//        headers.add("Content-Disposition", "attachment; purchase_invoice.html");
 
-        return ResponseEntity.ok().headers(headers).body(generatePurchaseInvoice(purchase));
+        return ResponseEntity.ok().headers(headers).body(reportsController.generatePurchaseInvoice(purchase));
     }
 
     private Purchase createPurchaseRecord(@RequestBody PurchaseOrderRequest orderRequest)
@@ -110,16 +109,4 @@ public class PurchaseController
         return new Purchase(supplier, date, products);
     }
 
-    private String generatePurchaseInvoice(Purchase purchase)
-    {
-        String status = purchase.getArrival_date().equals("null") ? "PENDING" : "DELIVERED";
-        return reportBuilder.withContext()
-                    .withProductList("products", purchase.getProducts())
-                    .withString("id", purchase.getId().toString())
-                    .withString("supplier", purchase.getSupplier().getName())
-                    .withString("purchase_date", purchase.getPurchase_date())
-                    .withString("status", status)
-                    .withString("arrival_date", purchase.getArrival_date())
-                    .buildReport("supplier-invoice");
-    }
 }

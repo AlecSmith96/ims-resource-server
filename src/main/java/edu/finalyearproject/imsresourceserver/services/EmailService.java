@@ -82,7 +82,7 @@ public class EmailService
 
                 FileSystemResource fileSystemResource = new FileSystemResource(file);
                 MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
-                helper.setText("Here is your Order Summary Report for "+date);
+                helper.setText(body);
                 helper.addAttachment(filename+".html", fileSystemResource, "text/html");
             };
     }

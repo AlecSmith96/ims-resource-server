@@ -1,6 +1,5 @@
 package edu.finalyearproject.imsresourceserver.repositories;
 
-import edu.finalyearproject.imsresourceserver.models.Customer;
 import edu.finalyearproject.imsresourceserver.models.Order;
 import edu.finalyearproject.imsresourceserver.models.Product;
 import org.springframework.data.repository.CrudRepository;

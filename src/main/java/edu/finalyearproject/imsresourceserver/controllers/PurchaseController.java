@@ -59,7 +59,7 @@ public class PurchaseController
     }
 
     /**
-     * POST method for setting a purchase order arrival date to todays date.
+     * POST method for setting a purchase order arrival date to todays date and updates product quantities.
      * @param id - the id(primary key) of the purchase order to set to delivered.
      * @return void
      */
@@ -75,6 +75,11 @@ public class PurchaseController
         purchase.setArrival_date(date);
 
         // UPDATE product quantities
+        Set<Product> products = purchase.getProducts();
+        products.stream().forEach(product -> {
+            product.setInventory_on_hand(product.getInventory_on_hand() + product.getReorder_quantity());
+            productRepository.save(product);
+        });
 
         purchaseRepository.save(purchase);
     }

@@ -1,25 +1,19 @@
 package edu.finalyearproject.imsresourceserver.controllers;
 
-import edu.finalyearproject.imsresourceserver.models.Order;
-import edu.finalyearproject.imsresourceserver.models.OrderPageOrder;
-import edu.finalyearproject.imsresourceserver.models.Product;
+import edu.finalyearproject.imsresourceserver.models.*;
+import edu.finalyearproject.imsresourceserver.repositories.CustomerRepository;
 import edu.finalyearproject.imsresourceserver.repositories.OrderRepository;
 import edu.finalyearproject.imsresourceserver.repositories.ProductRepository;
+import edu.finalyearproject.imsresourceserver.requests.OrderRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.net.http.HttpResponse;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -30,6 +24,9 @@ public class OrderController
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private CustomerRepository customerRepository;
 
     private Logger log = LoggerFactory.getLogger(OrderController.class);
 
@@ -116,6 +113,21 @@ public class OrderController
     public List<Order> getOrdersForCustomer(int customer_id)
     {
         return orderRepository.findBycustomer(customer_id);
+    }
+
+    @PostMapping("/order/create")
+    public void createNewOrder(@RequestBody OrderRequest orderRequest)
+    {
+        Optional<Customer> customer = customerRepository.findById(orderRequest.getCustomer_id());
+        Set<Product> products = Arrays.stream(orderRequest.getProducts()).map(product ->
+                                        productRepository.findBysku(Integer.valueOf(product.))).collect(Collectors.toSet());
+        Order order = new Order();
+        order.setCustomer(customer.get());
+        order.setProducts(products);
+
+        // UPDATE product quantities
+
+        orderRepository.save(order);
     }
 }
 

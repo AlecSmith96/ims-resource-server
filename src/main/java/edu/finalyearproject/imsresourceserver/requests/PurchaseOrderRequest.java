@@ -4,6 +4,9 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * Model class for processing JSON from front end application for creating a new Purchase Order.
+ */
 @Data
 public class PurchaseOrderRequest
 {

@@ -1,3 +1,9 @@
+/**
+ * Copyright (C) Alec R. C. Smith - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ * Written by Alec Smith <alec.smith@uea.ac.uk>, 2020-2021
+ */
 package edu.finalyearproject.imsresourceserver.controllers;
 
 import edu.finalyearproject.imsresourceserver.models.*;
@@ -120,7 +126,8 @@ public class OrderController
     {
         Optional<Customer> customer = customerRepository.findById(orderRequest.getCustomer_id());
         Set<Product> products = Arrays.stream(orderRequest.getProducts()).map(product ->
-                                        productRepository.findBysku(Integer.valueOf(product.))).collect(Collectors.toSet());
+                            productRepository.findBysku(Integer.valueOf(product.getSku()))).collect(Collectors.toSet());
+
         Order order = new Order();
         order.setCustomer(customer.get());
         order.setProducts(products);

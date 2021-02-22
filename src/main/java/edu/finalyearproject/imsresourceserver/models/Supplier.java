@@ -21,4 +21,5 @@ public class Supplier
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Integer id;
     private String name;
+    private Float lead_time;
 }

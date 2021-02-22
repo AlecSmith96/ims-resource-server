@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -102,5 +103,43 @@ public class ProductController
     public void removeProduct(@PathVariable Integer id)
     {
         productRepository.deleteById(id);
+    }
+
+    @GetMapping("/product/{id}")
+    public Product getProduct(@PathVariable Integer id)
+    {
+        Optional<Product> productOptional = productRepository.findById(id);
+        if (productOptional.isPresent())
+        {
+            return  productOptional.get();
+        }
+
+        return new Product();
+    }
+
+    @PostMapping("/product/suspend/{id}")
+    public void suspendProduct(@PathVariable Integer id)
+    {
+        Optional<Product> productOptional = productRepository.findById(id);
+
+        if (productOptional.isPresent())
+        {
+            Product product = productOptional.get();
+            product.setSuspended(true);
+            productRepository.save(product);
+        }
+    }
+
+    @PostMapping("/product/reinstate/{id}")
+    public void reinstateProduct(@PathVariable Integer id)
+    {
+        Optional<Product> productOptional = productRepository.findById(id);
+
+        if (productOptional.isPresent())
+        {
+            Product product = productOptional.get();
+            product.setSuspended(false);
+            productRepository.save(product);
+        }
     }
 }

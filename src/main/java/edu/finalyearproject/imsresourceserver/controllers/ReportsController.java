@@ -15,6 +15,7 @@ import edu.finalyearproject.imsresourceserver.services.EmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,6 +38,9 @@ public class ReportsController
     @Autowired
     private ReportBuilder reportBuilder;
 
+    @Value("manager.email")
+    private String managerEmail;
+
     private Logger log = LoggerFactory.getLogger(PurchaseController.class);
 
     // NEEDS TO INCLUDE DATE FROM AND DATE TO SO ONLY ORDERS FROM WITHIN THOSE DATES ARE RETURNED
@@ -53,7 +57,7 @@ public class ReportsController
                             .withString("todaysDate", dtf.format(now))
                             .buildReport("order-summary");
 
-        emailService.sendEmailWithAttachment("rcsmith.alec@gmail.com", "order summary", "Here is your Order Summary Report for "+dtf.format(now), html, "order-summary", dtf.format(now));
+        emailService.sendEmailWithAttachment(managerEmail, "order summary", "Here is your Order Summary Report for "+dtf.format(now), html, "order-summary", dtf.format(now));
 
         return html;
     }

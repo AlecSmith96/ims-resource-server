@@ -10,6 +10,7 @@ import edu.finalyearproject.imsresourceserver.models.Product;
 import edu.finalyearproject.imsresourceserver.models.Supplier;
 import edu.finalyearproject.imsresourceserver.repositories.ProductRepository;
 import edu.finalyearproject.imsresourceserver.repositories.SupplierRepository;
+import edu.finalyearproject.imsresourceserver.requests.NewProductRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,6 +116,17 @@ public class ProductController
         }
 
         return new Product();
+    }
+
+    @PostMapping("/product/add")
+    public void addProduct(@RequestBody NewProductRequest productRequest)
+    {
+        log.info("Adding new product to database: "+ productRequest.getName());
+        Supplier supplier = supplierRepository.findByname(productRequest.getSupplierName());
+        Product newProduct = new Product(productRequest.getName(), Integer.valueOf(productRequest.getSku()), productRequest.getPrice(),
+                productRequest.getInventoryOnHand(), productRequest.getReorderThreshold(),
+                productRequest.getReorderQuantity(), supplier);
+        productRepository.save(newProduct);
     }
 
     @PostMapping("/product/suspend/{id}")

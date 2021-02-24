@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -87,6 +88,26 @@ public class PurchaseController
         });
 
         purchaseRepository.save(purchase);
+    }
+
+    /**
+     * POST method to reorder a purchase order with the corresponding id.
+     * @param id - the id of the purchase order to be reordered.
+     */
+    @PostMapping("/purchase/reorder/{id}")
+    public void reorderPurchaseOrder(@PathVariable Integer id)
+    {
+        log.info("Reording products from supplier order #"+id);
+        Optional<Purchase> purchase = purchaseRepository.findById(id);
+        if (purchase.isPresent())
+        {
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            LocalDateTime now = LocalDateTime.now();
+            Set<Product> products = new HashSet<>(purchase.get().getProducts());
+            Purchase newPurchase = new Purchase(purchase.get().getSupplier(), Date.valueOf(dtf.format(now)), products);
+
+            purchaseRepository.save(newPurchase);
+        }
     }
 
     /**

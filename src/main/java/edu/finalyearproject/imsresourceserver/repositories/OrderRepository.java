@@ -6,6 +6,7 @@
  */
 package edu.finalyearproject.imsresourceserver.repositories;
 
+import edu.finalyearproject.imsresourceserver.models.Customer;
 import edu.finalyearproject.imsresourceserver.models.Order;
 import edu.finalyearproject.imsresourceserver.models.Product;
 import org.springframework.data.repository.CrudRepository;
@@ -18,6 +19,6 @@ public interface OrderRepository extends CrudRepository<Order, Integer>
 {
     List<Order> findAll();
     Order findByid(int id);
-    List<Order> findBycustomer(int customer_id);
+    List<Order> findBycustomer(Customer customer);
     List<Order> findByproducts(Product product);
 }

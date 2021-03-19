@@ -115,10 +115,18 @@ public class OrderController
         throw new Exception("Unrecognised Product");
     }
 
-    @GetMapping("/customer/{id}")
-    public List<Order> getOrdersForCustomer(int customer_id)
+    @GetMapping("/customer/{customer_id}")
+    public List<Order> getOrdersForCustomer(@PathVariable  int customer_id)
     {
-        return orderRepository.findBycustomer(customer_id);
+        Optional<Customer> customer = customerRepository.findById(customer_id);
+        List<Order> allOrders = orderRepository.findAll();
+        if (customer.isPresent())
+        {
+            return allOrders.stream().filter(order -> order.getCustomer().equals(customer.get()))
+                                                                         .collect(Collectors.toList());
+        }
+
+        return new ArrayList<>();
     }
 
     @PostMapping("/order/create")

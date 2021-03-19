@@ -8,6 +8,7 @@ package edu.finalyearproject.imsresourceserver.repositories;
 
 import edu.finalyearproject.imsresourceserver.models.Product;
 import edu.finalyearproject.imsresourceserver.models.Purchase;
+import edu.finalyearproject.imsresourceserver.models.Supplier;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -18,7 +19,7 @@ public interface PurchaseRepository extends CrudRepository<Purchase, Integer>
 {
     List<Purchase> findAll();
     Purchase findByid(int id);
-    List<Purchase> findBysupplier(int supplier_id);
+    List<Purchase> findBysupplier(Supplier supplier);
     List<Purchase> findByproducts(Product product);
 
     @Override

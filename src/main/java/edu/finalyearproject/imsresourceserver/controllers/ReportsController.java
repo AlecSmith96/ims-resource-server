@@ -38,7 +38,7 @@ public class ReportsController
     @Autowired
     private ReportBuilder reportBuilder;
 
-    @Value("manager.email")
+    @Value("${manager.email}")
     private String managerEmail;
 
     private Logger log = LoggerFactory.getLogger(PurchaseController.class);
@@ -91,7 +91,7 @@ public class ReportsController
     public String generatePurchaseInvoice(@RequestBody Purchase purchase)
     {
         String status = purchase.getArrival_date().equals("null") ? "PENDING" : "DELIVERED";
-        return reportBuilder.withContext()
+        String html = reportBuilder.withContext()
                 .withProductList("products", purchase.getProducts())
                 .withString("id", purchase.getId().toString())
                 .withString("supplier", purchase.getSupplier().getName())
@@ -99,5 +99,11 @@ public class ReportsController
                 .withString("status", status)
                 .withString("arrival_date", purchase.getArrival_date())
                 .buildReport("supplier-invoice");
+
+        emailService.sendEmailWithAttachment(managerEmail, "Purchase Order #"+purchase.getId()+" Confirmation",
+                "Here is your invoice for your Supplier Purchase Order on  "+purchase.getPurchase_date(), html,
+                "purchase-order-"+purchase.getId(), purchase.getPurchase_date());
+
+        return html;
     }
 }

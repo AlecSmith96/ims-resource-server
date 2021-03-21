@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml"
+      lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.10/css/mdb.min.css" rel="stylesheet"/>
+    <title>Stock Movement</title>
+</head>
+<body>
+    <div class="container">
+        <div style="text-align: center;">
+            <h5>Stock Movement Report for period <span th:text="${startDate}">startDate</span> to  <span th:text="${endDate}">endDate</span></h5>
+        </div>
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th> Order # </th>
+                <th> Order Type </th>
+                <th> Name </th>
+                <th> Date </th>
+                <th> Product Name </th>
+                <th> Sku </th>
+                <th> Quantity </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${stockMovements.empty}">
+                <td colspan="2"> No Stock Movements for this period. </td>
+            </tr>
+            <tr th:each="stockMovement : ${stockMovements}">
+                <td><span th:text="${stockMovement.id}"> Id </span></td>
+                <td>
+                    <span th:if="${stockMovement.supplierOrder == true}"> Supplier </span>
+                    <span th:unless="${stockMovement.supplierOrder == true}"> Customer </span>
+                </td>
+                <td><span th:text="${stockMovement.name}"> Name </span></td>
+                <td><span th:text="${stockMovement.dateOfMovement}"> Date </span></td>
+                <td><span th:text="${stockMovement.product.name}"> Name </span></td>
+                <td><span th:text="${stockMovement.product.sku}"> Sku </span></td>
+                <td><span th:text="${stockMovement.quantity}"> Quantity </span></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

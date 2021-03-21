@@ -7,8 +7,10 @@
 package edu.finalyearproject.imsresourceserver.reports;
 
 import com.lowagie.text.DocumentException;
+import edu.finalyearproject.imsresourceserver.controllers.ReportsController;
 import edu.finalyearproject.imsresourceserver.models.Order;
 import edu.finalyearproject.imsresourceserver.models.Product;
+import edu.finalyearproject.imsresourceserver.requests.StockMovement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
@@ -59,8 +61,8 @@ public class ReportBuilder
     }
 
     /**
-     * Builder method for adding a List of Product objects to the context.
-     * @param listName - the variable name of the list.
+     * Builder method for adding a Set of Product objects to the context.
+     * @param listName - the variable name of the set.
      * @param products - the list of Product objects.
      * @return ReportBuilder - the current instance of the builder.
      */
@@ -68,6 +70,18 @@ public class ReportBuilder
     {
         context.setVariable(listName, products);
 
+        return this;
+    }
+
+    /**
+     * Builder method for adding a List of StockMovement objects to the context.
+     * @param listName - the variable name of the list.
+     * @param stockMovements - the list of StockMovement objects.
+     * @return ReportBuilder - the current instance of the builder.
+     */
+    public ReportBuilder withStockMovementList(String listName, List<StockMovement> stockMovements)
+    {
+        context.setVariable(listName, stockMovements);
         return this;
     }
 

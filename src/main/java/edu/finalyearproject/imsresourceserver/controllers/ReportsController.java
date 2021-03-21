@@ -8,9 +8,12 @@ package edu.finalyearproject.imsresourceserver.controllers;
 
 import com.lowagie.text.DocumentException;
 import edu.finalyearproject.imsresourceserver.models.Order;
+import edu.finalyearproject.imsresourceserver.models.Product;
 import edu.finalyearproject.imsresourceserver.models.Purchase;
 import edu.finalyearproject.imsresourceserver.reports.ReportBuilder;
 import edu.finalyearproject.imsresourceserver.repositories.OrderRepository;
+import edu.finalyearproject.imsresourceserver.repositories.PurchaseRepository;
+import edu.finalyearproject.imsresourceserver.requests.StockMovement;
 import edu.finalyearproject.imsresourceserver.services.EmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,15 +25,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.sql.Date;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class ReportsController
 {
     @Autowired
     private OrderRepository orderRepository;
+
+    @Autowired
+    private PurchaseRepository purchaseRepository;
 
     @Autowired
     private EmailService emailService;
@@ -105,5 +121,104 @@ public class ReportsController
                 "purchase-order-"+purchase.getId(), purchase.getPurchase_date());
 
         return html;
+    }
+
+    @GetMapping("/reports/stock-movement/{startDate}/{endDate}")
+    public String generateStockMovementReport(@PathVariable String startDate, @PathVariable String endDate)
+    {
+        log.info("Generating Stock Movement Report for dates "+startDate+" to "+endDate);
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy");
+        Date startDateObject = Date.valueOf(startDate);
+        Date endDateObject = Date.valueOf(endDate);
+        String startDateString = dateFormatter.format(startDateObject);
+        String endDateString = dateFormatter.format(endDateObject);
+        String now = dateFormatter.format(Date.from(Instant.now()));
+
+        // get all stock movements in range
+        List<Order> customerOrders = getCustomerOrdersInRange(startDateObject,  endDateObject);
+        List<Purchase> supplierOrders = getSupplierOrdersInRange(startDateObject, endDateObject);
+        List<StockMovement> stockMovements = getAllStockMovements(customerOrders, supplierOrders);
+        Collections.sort(stockMovements);       // sort by date of movement
+
+        String html = reportBuilder.withContext()
+                .withString("startDate", dateFormatter.format(startDateObject))
+                .withString("endDate", dateFormatter.format(endDateObject))
+                .withStockMovementList("stockMovements", stockMovements)
+                .buildReport("stock-movement");
+
+        emailService.sendEmailWithAttachment(managerEmail, "Stock Movement Report "+ startDateString +" to "+ endDateString,
+                "Here is your Stock Movement Report for your requested time period.", html,
+                "stock-movements-"+startDateString + "_"+endDateString, now);
+
+        return html;
+    }
+
+    // parse string representation of date into Date object for comparison
+    private Date createDateObject(String stringDate)
+    {
+        String[] array = stringDate.split("-");
+        return Date.valueOf(array[2]+"-"+array[1]+"-"+array[0]);
+    }
+
+    // Returns list of customer orders within given time frame
+    private List<Order> getCustomerOrdersInRange(Date startDate, Date endDate)
+    {
+        List<Order> customerOrders = orderRepository.findAll();
+
+        return customerOrders.stream().filter(order -> {
+            Date orderDate = createDateObject(order.getOrder_date());
+            return orderDate.after(startDate) && orderDate.before(endDate);
+        }).collect(Collectors.toList());
+    }
+
+    // Returns list of supplier orders within given time frame
+    private List<Purchase> getSupplierOrdersInRange(Date startDate, Date endDate)
+    {
+        List<Purchase> purchaseOrders = purchaseRepository.findAll();
+
+        return purchaseOrders.stream().filter(order -> {
+            Date orderDate = createDateObject(order.getPurchase_date());
+            return orderDate.after(startDate) && orderDate.before(endDate);
+        }).collect(Collectors.toList());
+    }
+
+    // Returns all Stock movements for all orders
+    private List<StockMovement> getAllStockMovements(List<Order> orders, List<Purchase> purchases)
+    {
+        List<StockMovement> stockMovements = new ArrayList<>();
+        getStockMovementsForCustomerOrders(orders, stockMovements);
+        getStockMovementsForSupplierOrders(purchases, stockMovements);
+
+        return stockMovements;
+    }
+
+    // adds stock movements for supplier orders to list
+    private void getStockMovementsForSupplierOrders(List<Purchase> purchases, List<StockMovement> stockMovements)
+    {
+        for (Purchase purchase : purchases)
+        {
+            for (Product product : purchase.getProducts())
+            {
+                StockMovement stockMovement = new StockMovement(purchase.getId(), true,
+                        createDateObject(purchase.getPurchase_date()), purchase.getSupplier().getName(), product,
+                        product.getReorder_quantity());
+                stockMovements.add(stockMovement);
+            }
+        }
+    }
+
+    // adds stock movements for customer orders to list
+    private void getStockMovementsForCustomerOrders(List<Order> orders, List<StockMovement> stockMovements)
+    {
+        for (Order order : orders)
+        {
+            for (Product product : order.getProducts())
+            {
+                StockMovement stockMovement = new StockMovement(order.getId(), false, createDateObject(order.getOrder_date()),
+                        order.getCustomer().getTitle()+" "+order.getCustomer().getFirst_name()+ " "+
+                                order.getCustomer().getLast_name(), product, 1);
+                stockMovements.add(stockMovement);
+            }
+        }
     }
 }

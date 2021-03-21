@@ -59,21 +59,60 @@ public class ReportsController
 
     private Logger log = LoggerFactory.getLogger(PurchaseController.class);
 
-    // NEEDS TO INCLUDE DATE FROM AND DATE TO SO ONLY ORDERS FROM WITHIN THOSE DATES ARE RETURNED
-    @GetMapping("/reports/order-summary")
-    public String generateOrderSummary() throws IOException, DocumentException
+    /**
+     * GET method for generating an order summary report containing customer orders within a given time period.
+     * @param startDate - the earliest date an order could have been made on.
+     * @param endDate - the latest date an order could have been made on.
+     * @return String - HTML report.
+     */
+    @GetMapping("/reports/order-summary/{startDate}/{endDate}")
+    public String generateOrderSummary(@PathVariable String startDate, @PathVariable String endDate)
     {
+        log.info("Generating Order Summary Report for orders within " + startDate +" and "+endDate);
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy");
         LocalDateTime now = LocalDateTime.now();
 
-        log.info("Generating Order Summary Report...");
-        List<Order> orders = orderRepository.findAll();
+        List<Order> orders = getCustomerOrdersInRange(Date.valueOf(startDate),  Date.valueOf(endDate));
+        Collections.sort(orders);
+
         String html = reportBuilder.withContext()
                             .withOrdersList("orders", orders)
                             .withString("todaysDate", dtf.format(now))
+                            .withString("startDate", dateFormatter.format(Date.valueOf(startDate)))
+                            .withString("endDate", dateFormatter.format(Date.valueOf(endDate)))
                             .buildReport("order-summary");
 
         emailService.sendEmailWithAttachment(managerEmail, "order summary", "Here is your Order Summary Report for "+dtf.format(now), html, "order-summary", dtf.format(now));
+
+        return html;
+    }
+
+    /**
+     * GET method for generating a purchase order summary report containing supplier orders within a given time period.
+     * @param startDate - the earliest date an order could have been made on.
+     * @param endDate - the latest date an order could have been made on.
+     * @return String - HTML report.
+     */
+    @GetMapping("/reports/purchase-summary/{startDate}/{endDate}")
+    public String generatePurchaseSummary(@PathVariable String startDate, @PathVariable String endDate)
+    {
+        log.info("Generating Purchase Summary Report for supplier orders within " + startDate + " and "+endDate);
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy");
+        LocalDateTime now = LocalDateTime.now();
+
+        List<Purchase> supplierOrders = getSupplierOrdersInRange(Date.valueOf(startDate), Date.valueOf(endDate));
+        Collections.sort(supplierOrders);
+
+        String html = reportBuilder.withContext()
+                .withPurchasesList("purchases", supplierOrders)
+                .withString("todaysDate", dtf.format(now))
+                .withString("startDate", dateFormatter.format(Date.valueOf(startDate)))
+                .withString("endDate", dateFormatter.format(Date.valueOf(endDate)))
+                .buildReport("purchase-summary");
+
+        emailService.sendEmailWithAttachment(managerEmail, "purchase order summary", "Here is your Purchase Order Summary Report for "+dtf.format(now), html, "order-summary", dtf.format(now));
 
         return html;
     }
@@ -123,6 +162,13 @@ public class ReportsController
         return html;
     }
 
+    /**
+     * GET method for generating a stock movement report containing movements for customer and supplier orders within a
+     * given time period.
+     * @param startDate - the earliest date a stock movement can be on.
+     * @param endDate - the latest date a stock movement can be on.
+     * @return String - HTML report.
+     */
     @GetMapping("/reports/stock-movement/{startDate}/{endDate}")
     public String generateStockMovementReport(@PathVariable String startDate, @PathVariable String endDate)
     {

@@ -6,18 +6,15 @@
  */
 package edu.finalyearproject.imsresourceserver.reports;
 
-import com.lowagie.text.DocumentException;
-import edu.finalyearproject.imsresourceserver.controllers.ReportsController;
 import edu.finalyearproject.imsresourceserver.models.Order;
 import edu.finalyearproject.imsresourceserver.models.Product;
+import edu.finalyearproject.imsresourceserver.models.Purchase;
 import edu.finalyearproject.imsresourceserver.requests.StockMovement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import org.xhtmlrenderer.pdf.ITextRenderer;
 
-import java.io.*;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -57,6 +54,18 @@ public class ReportBuilder
     {
         context.setVariable(listName, orders);
 
+        return this;
+    }
+
+    /**
+     * Builder method for adding a List of Purchase objects to the context.
+     * @param listName - the variable name of the list.
+     * @param purchases - the list of Purchase objects.
+     * @return ReportBuilder - the current instance of the builder.
+     */
+    public ReportBuilder withPurchasesList(String listName, List<Purchase> purchases)
+    {
+        context.setVariable(listName, purchases);
         return this;
     }
 
@@ -105,27 +114,5 @@ public class ReportBuilder
     public String buildReport(String templateName)
     {
         return templateEngine.process(templateName, context);
-    }
-
-    public void buildHtmlFile(String templateName, String fileName) throws IOException
-    {
-        String html = templateEngine.process(templateName, context);
-
-        BufferedWriter fileWriter = new BufferedWriter(new FileWriter(System.getProperty("user.home") + File.separator + fileName));
-        fileWriter.write(html);
-        fileWriter.close();
-    }
-
-    public static void generatePdfFromHtml(String html, String fileName) throws DocumentException, IOException
-    {
-        String outputFolder = System.getProperty("user.home") + File.separator + fileName;
-        OutputStream outputStream = new FileOutputStream(outputFolder);
-
-        ITextRenderer renderer = new ITextRenderer();
-        renderer.setDocumentFromString(html);
-        renderer.layout();
-        renderer.createPDF(outputStream);
-
-        outputStream.close();
     }
 }

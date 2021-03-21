@@ -20,7 +20,7 @@ import java.util.Set;
 @Table(name = "purchases")
 @Data
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Purchase
+public class Purchase implements Comparable<Purchase>
 {
     @Transient
     public static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd-MM-yyyy");
@@ -56,6 +56,17 @@ public class Purchase
         this.supplier = supplier;
         this.purchase_date = date;
         this.products = products;
+    }
+
+    public Date getPurchaseDateObject()
+    {
+        return purchase_date;
+    }
+
+    @Override
+    public int compareTo(Purchase purchase)
+    {
+        return purchase_date.compareTo(purchase.getPurchaseDateObject());
     }
 
     public String getPurchase_date()

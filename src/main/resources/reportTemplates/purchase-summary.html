@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/xhtml"
+      lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.10/css/mdb.min.css" rel="stylesheet"/>
+    <title>Purchases Summary</title>
+</head>
+<body>
+<div class="container">
+    <div style="text-align: center;">
+        <h5>Purchase Orders Summary Report <span th:text="${startDate}">date</span> to <span th:text="${endDate}">date</span></h5>
+    </div>
+    <div class="col-md-10">
+        <table class="table table-bordered table-striped">
+            <thead>
+            <tr>
+                <th> Order # </th>
+                <th> Supplier </th>
+                <th> Ordered On </th>
+                <th> Status </th>
+                <th> Delivered On </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${purchases.empty}">
+                <td colspan="2"> No Orders Available </td>
+            </tr>
+            <tr th:each="purchase : ${purchases}">
+                <td><span th:text="${purchase.id}"> Id </span></td>
+                <td><span th:text="${purchase.supplier.name}"> Customer </span></td>
+                <td><span th:text="${purchase.purchase_date}"> Order Date </span></td>
+                <td><span th:text="${purchase.arrival_date} == 'null' ? 'PENDING' : 'DELIVERED'"> Order Date </span></td>
+                <td><span th:text="${purchase.arrival_date} == 'null' ? 'N/A' : ${purchase.arrival_date}"> Order Date </span></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

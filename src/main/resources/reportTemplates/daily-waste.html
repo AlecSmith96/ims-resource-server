@@ -6,9 +6,36 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.8.10/css/mdb.min.css" rel="stylesheet">
-    <title>Waste Report</title>
+    <title>Daily Waste</title>
 </head>
 <body>
-
+<div class="container">
+    <div style="text-align: center;">
+        <h5>Daily Waste Report for <span th:text="${todaysDate}">date</span></h5>
+    </div>
+    <div>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th> Product Name </th>
+                    <th> Sku </th>
+                    <th> Reason For Wastage </th>
+                    <th> Quantity </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:if="${records.empty}">
+                    <td colspan="4"> No Products Available </td>
+                </tr>
+                <tr th:each="record : ${records}">
+                    <td><span th:text="${record.name}"> Name </span></td>
+                    <td><span th:text="${record.sku}"> sku </span></td>
+                    <td><span th:text="${record.reason}"> reason </span></td>
+                    <td><span th:text="${record.quantity}"> quantity </span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 </body>
 </html>

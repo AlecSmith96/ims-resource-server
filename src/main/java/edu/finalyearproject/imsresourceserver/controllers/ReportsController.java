@@ -12,17 +12,16 @@ import edu.finalyearproject.imsresourceserver.models.Product;
 import edu.finalyearproject.imsresourceserver.models.Purchase;
 import edu.finalyearproject.imsresourceserver.reports.ReportBuilder;
 import edu.finalyearproject.imsresourceserver.repositories.OrderRepository;
+import edu.finalyearproject.imsresourceserver.repositories.ProductRepository;
 import edu.finalyearproject.imsresourceserver.repositories.PurchaseRepository;
 import edu.finalyearproject.imsresourceserver.requests.StockMovement;
+import edu.finalyearproject.imsresourceserver.requests.WasteItem;
 import edu.finalyearproject.imsresourceserver.services.EmailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -47,6 +46,9 @@ public class ReportsController
 
     @Autowired
     private PurchaseRepository purchaseRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     @Autowired
     private EmailService emailService;
@@ -195,6 +197,39 @@ public class ReportsController
         emailService.sendEmailWithAttachment(managerEmail, "Stock Movement Report "+ startDateString +" to "+ endDateString,
                 "Here is your Stock Movement Report for your requested time period.", html,
                 "stock-movements-"+startDateString + "_"+endDateString, now);
+
+        return html;
+    }
+
+    /**
+     * POST method for submitting the daily waste report. Updates stock levels for each product in report.
+     * @param records - List of products with quantities of wasted items.
+     * @return String - HTML report
+     */
+    @PostMapping("/reports/waste")
+    public String GenerateWasteReport(@RequestBody List<WasteItem> records)
+    {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MM-yyyy");
+        String now = dateFormatter.format(Date.from(Instant.now()));
+
+        // update stock levels
+        records.stream().forEach(record -> {
+            Product product = productRepository.findBysku(record.getSku());
+            record.setName(product.getName());
+            product.setInventory_on_hand(product.getInventory_on_hand() - record.getQuantity());
+            productRepository.save(product);
+        });
+
+        // generate report
+        String html = reportBuilder.withContext()
+                                    .withString("todaysDate", now)
+                                    .withWasteItemList("records", records)
+                                    .buildReport("daily-waste");
+
+        // email report to manager
+        emailService.sendEmailWithAttachment(managerEmail, "Daily Waste Report "+ now,
+                "Here is the Daily Waste Report for today.", html,
+                "daily-waste_"+now, now);
 
         return html;
     }

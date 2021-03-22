@@ -27,7 +27,7 @@
             </thead>
             <tbody>
             <tr th:if="${stockMovements.empty}">
-                <td colspan="2"> No Stock Movements for this period. </td>
+                <td colspan="7"> No Stock Movements for this period. </td>
             </tr>
             <tr th:each="stockMovement : ${stockMovements}">
                 <td><span th:text="${stockMovement.id}"> Id </span></td>

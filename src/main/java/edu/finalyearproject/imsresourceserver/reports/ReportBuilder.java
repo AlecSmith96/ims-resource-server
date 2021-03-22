@@ -10,6 +10,7 @@ import edu.finalyearproject.imsresourceserver.models.Order;
 import edu.finalyearproject.imsresourceserver.models.Product;
 import edu.finalyearproject.imsresourceserver.models.Purchase;
 import edu.finalyearproject.imsresourceserver.requests.StockMovement;
+import edu.finalyearproject.imsresourceserver.requests.WasteItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
@@ -91,6 +92,18 @@ public class ReportBuilder
     public ReportBuilder withStockMovementList(String listName, List<StockMovement> stockMovements)
     {
         context.setVariable(listName, stockMovements);
+        return this;
+    }
+
+    /**
+     * Builder method for adding a List of WasteItem objects to the context.
+     * @param listName - the variable name of the list.
+     * @param records - the list of WasteItem objects.
+     * @return ReportBuilder - the current instance of the builder.
+     */
+    public ReportBuilder withWasteItemList(String listName, List<WasteItem> records)
+    {
+        context.setVariable(listName, records);
         return this;
     }
 

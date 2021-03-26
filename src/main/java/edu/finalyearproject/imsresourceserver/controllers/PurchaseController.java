@@ -23,10 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -49,7 +46,9 @@ public class PurchaseController
     @GetMapping("/purchases/all")
     public List<Purchase> getPurchases()
     {
-        return purchaseRepository.findAll();
+        List<Purchase> all = purchaseRepository.findAll();
+        Collections.sort(all, Collections.reverseOrder());
+        return all;
     }
 
     @GetMapping("/purchases/product/{product_id}")
@@ -123,7 +122,6 @@ public class PurchaseController
         purchaseRepository.save(purchase);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "text/html");
-//        headers.add("Content-Disposition", "attachment; purchase_invoice.html");
 
         return ResponseEntity.ok().headers(headers).body(reportsController.generatePurchaseInvoice(purchase));
     }

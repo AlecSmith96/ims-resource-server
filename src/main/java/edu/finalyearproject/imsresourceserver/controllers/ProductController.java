@@ -6,8 +6,10 @@
  */
 package edu.finalyearproject.imsresourceserver.controllers;
 
+import edu.finalyearproject.imsresourceserver.models.Order;
 import edu.finalyearproject.imsresourceserver.models.Product;
 import edu.finalyearproject.imsresourceserver.models.Supplier;
+import edu.finalyearproject.imsresourceserver.repositories.OrderRepository;
 import edu.finalyearproject.imsresourceserver.repositories.ProductRepository;
 import edu.finalyearproject.imsresourceserver.repositories.SupplierRepository;
 import edu.finalyearproject.imsresourceserver.requests.NewProductRequest;
@@ -16,8 +18,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
+import java.sql.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 
@@ -29,6 +38,9 @@ public class ProductController
 
     @Autowired
     private SupplierRepository supplierRepository;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     private Logger log = LoggerFactory.getLogger(ProductController.class);
 
@@ -153,5 +165,75 @@ public class ProductController
             product.setSuspended(false);
             productRepository.save(product);
         }
+    }
+
+    @GetMapping("/product/adu/{id}")
+    public float getAverageDailySales(@PathVariable int id)
+    {
+        log.info("Calculating ADU for product "+id+"...");
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime now = LocalDateTime.now();
+        Date today = Date.valueOf(dtf.format(now));
+        Date twoWeeksAgo = getDateTwoWeeksBefore(today);
+        List<Order> ordersInRange = getCustomerOrdersInRange(twoWeeksAgo, today);
+        int totalSales = getTotalSales(id, ordersInRange);
+
+        // if there is a remainder, +1 to value to account for integer division
+        float ADU = (totalSales / 14) % 14 == 1 ? totalSales / 14 +1 : totalSales / 14;
+
+        return (float) (totalSales / 14.0);
+    }
+
+    private int getTotalSales(@PathVariable int id, List<Order> ordersInRange)
+    {
+        int totalSales = 0;
+        for (Order order : ordersInRange)
+        {
+            for (Product product : order.getProducts())
+            {
+                if (product.getId() == id)
+                {
+                    totalSales++;
+                }
+            }
+        }
+        return totalSales;
+    }
+
+    private Date getDateTwoWeeksBefore(Date today)
+    {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(today);
+        calendar.add(Calendar.DATE, -14); //2 weeks
+
+        return new Date(calendar.getTime().getTime());
+    }
+
+    // Returns list of customer orders within given time frame
+    private List<Order> getCustomerOrdersInRange(Date startDate, Date endDate)
+    {
+        List<Order> customerOrders = orderRepository.findAll();
+        List<Order> ordersInRange = new ArrayList<>();
+        for (Order order : customerOrders)
+        {
+            Date date = createDateObject(order.getOrder_date());
+            if (date.after(startDate) && date.before(endDate))
+            {
+                ordersInRange.add(order);
+            }
+            if (date.equals(startDate) || date.equals(endDate))
+            {
+                ordersInRange.add(order);
+            }
+        }
+
+        return ordersInRange;
+    }
+
+    // parse string representation of date into Date object for comparison
+    private java.sql.Date createDateObject(String stringDate)
+    {
+        String[] array = stringDate.split("-");
+        return java.sql.Date.valueOf(array[2]+"-"+array[1]+"-"+array[0]);
     }
 }

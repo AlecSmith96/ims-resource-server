@@ -11,10 +11,12 @@ import edu.finalyearproject.imsresourceserver.repositories.CustomerRepository;
 import edu.finalyearproject.imsresourceserver.repositories.OrderRepository;
 import edu.finalyearproject.imsresourceserver.repositories.ProductRepository;
 import edu.finalyearproject.imsresourceserver.requests.OrderRequest;
+import edu.finalyearproject.imsresourceserver.requests.ProductRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.condition.ProducesRequestCondition;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
@@ -45,6 +47,7 @@ public class OrderController
     {
         log.info("Retrieving all orders from database...");
         List<Order> all = orderRepository.findAll();
+        Collections.sort(all, Collections.reverseOrder());
         return all;
     }
 
@@ -132,13 +135,25 @@ public class OrderController
     @PostMapping("/order/create")
     public void createNewOrder(@RequestBody OrderRequest orderRequest)
     {
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDateTime now = LocalDateTime.now();
+        Date date = Date.valueOf(dtf.format(now));
         Optional<Customer> customer = customerRepository.findById(orderRequest.getCustomer_id());
-        Set<Product> products = Arrays.stream(orderRequest.getProducts()).map(product ->
-                            productRepository.findBysku(Integer.valueOf(product.getSku()))).collect(Collectors.toSet());
+        Set<Product> products = new HashSet<>();
+        for (ProductRequest productRequest : orderRequest.getProducts())
+        {
+            Product product = productRepository.findBysku(Integer.valueOf(productRequest.getSku()));
+            for (int i = 0 ; i < productRequest.getQuantity() ; i++)
+            {
+                products.add(product);
+            }
+        }
+
 
         Order order = new Order();
         order.setCustomer(customer.get());
         order.setProducts(products);
+        order.setOrder_date(date);
 
         // UPDATE product quantities
 

@@ -167,6 +167,19 @@ public class ProductController
         }
     }
 
+    /**
+     * Get method to return any Products that have less than or equal to 20 stock left before hitting reorder point.
+     * @return List<Product> - List of Products low on stock.
+     */
+    @GetMapping("/products/low-stock")
+    public List<Product> getProductsLowOnStock()
+    {
+        log.info("Retrieving products low on stock...");
+        List<Product> allProducts = productRepository.findAll();
+        return allProducts.stream().filter(product -> product.getInventory_on_hand() <=
+                                                    (product.getReorder_threshold() +20)).collect(Collectors.toList());
+    }
+
     @GetMapping("/product/adu/{id}")
     public float getAverageDailySales(@PathVariable int id)
     {

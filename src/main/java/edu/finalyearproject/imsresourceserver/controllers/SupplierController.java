@@ -6,8 +6,10 @@
  */
 package edu.finalyearproject.imsresourceserver.controllers;
 
+import edu.finalyearproject.imsresourceserver.models.Product;
 import edu.finalyearproject.imsresourceserver.models.Purchase;
 import edu.finalyearproject.imsresourceserver.models.Supplier;
+import edu.finalyearproject.imsresourceserver.repositories.ProductRepository;
 import edu.finalyearproject.imsresourceserver.repositories.PurchaseRepository;
 import edu.finalyearproject.imsresourceserver.repositories.SupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,9 @@ public class SupplierController
 
     @Autowired
     private PurchaseRepository purchaseRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     @GetMapping("/suppliers/all")
     public List<Supplier> getSuppliers()
@@ -71,5 +76,17 @@ public class SupplierController
         }
 
         return new ArrayList<>();
+    }
+
+    @GetMapping("/supplier/product/{id}")
+    public Supplier getSupplierForProduct(@PathVariable int id)
+    {
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isPresent())
+        {
+            return product.get().getSupplier();
+        }
+
+        return new Supplier();
     }
 }

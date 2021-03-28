@@ -13,6 +13,7 @@ import edu.finalyearproject.imsresourceserver.repositories.OrderRepository;
 import edu.finalyearproject.imsresourceserver.repositories.ProductRepository;
 import edu.finalyearproject.imsresourceserver.repositories.SupplierRepository;
 import edu.finalyearproject.imsresourceserver.requests.NewProductRequest;
+import edu.finalyearproject.imsresourceserver.requests.ProductThresholdRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,6 +179,22 @@ public class ProductController
         List<Product> allProducts = productRepository.findAll();
         return allProducts.stream().filter(product -> product.getInventory_on_hand() <=
                                                     (product.getReorder_threshold() +20)).collect(Collectors.toList());
+    }
+
+    @PostMapping("/product/update/reorder-threshold/{id}")
+    public Product updateReorderThreshold(@PathVariable int id, @RequestBody ProductThresholdRequest request)
+    {
+        log.info("Updating reorder threshold for product "+id+"...");
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isPresent())
+        {
+            Product theProduct = product.get();
+            theProduct.setReorder_threshold(request.getNewThreshold());
+            productRepository.save(theProduct);
+            return theProduct;
+        }
+
+        return new Product();
     }
 
     @GetMapping("/product/adu/{id}")

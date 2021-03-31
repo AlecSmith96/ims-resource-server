@@ -13,6 +13,7 @@ import edu.finalyearproject.imsresourceserver.repositories.OrderRepository;
 import edu.finalyearproject.imsresourceserver.repositories.ProductRepository;
 import edu.finalyearproject.imsresourceserver.repositories.SupplierRepository;
 import edu.finalyearproject.imsresourceserver.requests.NewProductRequest;
+import edu.finalyearproject.imsresourceserver.requests.ProductAmountRequest;
 import edu.finalyearproject.imsresourceserver.requests.ProductThresholdRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -190,6 +191,22 @@ public class ProductController
         {
             Product theProduct = product.get();
             theProduct.setReorder_threshold(request.getNewThreshold());
+            productRepository.save(theProduct);
+            return theProduct;
+        }
+
+        return new Product();
+    }
+
+    @PostMapping("/product/update/reorder-amount/{id}")
+    public Product updateReorderAmount(@PathVariable int id, @RequestBody ProductAmountRequest request)
+    {
+        log.info("Updating reorder amount for product "+id+"...");
+        Optional<Product> product = productRepository.findById(id);
+        if (product.isPresent())
+        {
+            Product theProduct = product.get();
+            theProduct.setReorder_quantity(request.getNewAmount());
             productRepository.save(theProduct);
             return theProduct;
         }

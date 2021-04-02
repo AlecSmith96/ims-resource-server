@@ -11,6 +11,7 @@ import edu.finalyearproject.imsresourceserver.models.Product;
 import edu.finalyearproject.imsresourceserver.models.Purchase;
 import edu.finalyearproject.imsresourceserver.requests.StockMovement;
 import edu.finalyearproject.imsresourceserver.requests.WasteItem;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
@@ -25,6 +26,7 @@ import java.util.Set;
  * This uses a Builder design pattern to prevent context from consecutive report generations affecting one another.
  */
 @Component
+@Data
 public class ReportBuilder
 {
     @Autowired

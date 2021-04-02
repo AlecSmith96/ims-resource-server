@@ -147,6 +147,7 @@ public class ReportsController
     @GetMapping("/reports/supplier-invoice")
     public String generatePurchaseInvoice(@RequestBody Purchase purchase)
     {
+        log.info("Generating invoice for purchase order #"+purchase.getId());
         String status = purchase.getArrival_date().equals("null") ? "PENDING" : "DELIVERED";
         String html = reportBuilder.withContext()
                 .withProductList("products", purchase.getProducts())

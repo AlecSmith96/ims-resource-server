@@ -7,6 +7,7 @@
 package edu.finalyearproject.imsresourceserver.models;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -17,6 +18,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "products")
 @Data
+@AllArgsConstructor
 public class Product
 {
     @Id

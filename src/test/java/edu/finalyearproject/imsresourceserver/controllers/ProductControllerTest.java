@@ -12,15 +12,12 @@ import edu.finalyearproject.imsresourceserver.requests.ProductAmountRequest;
 import edu.finalyearproject.imsresourceserver.requests.ProductThresholdRequest;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.junit.runner.RunWith;
 
 import java.sql.Date;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

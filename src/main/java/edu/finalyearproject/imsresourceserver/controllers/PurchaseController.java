@@ -12,6 +12,7 @@ import edu.finalyearproject.imsresourceserver.models.Supplier;
 import edu.finalyearproject.imsresourceserver.repositories.ProductRepository;
 import edu.finalyearproject.imsresourceserver.repositories.PurchaseRepository;
 import edu.finalyearproject.imsresourceserver.repositories.SupplierRepository;
+import edu.finalyearproject.imsresourceserver.requests.ProductIds;
 import edu.finalyearproject.imsresourceserver.requests.PurchaseOrderRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,9 +73,7 @@ public class PurchaseController
     public void setOrderToDelivered(@PathVariable int id)
     {
         log.info("Setting purchase order " + id + " to delivered..");
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDateTime now = LocalDateTime.now();
-        Date date = Date.valueOf(dtf.format(now));
+        Date date = getDate();
 
         Purchase purchase = purchaseRepository.findByid(id);
         purchase.setArrival_date(date);
@@ -111,31 +110,54 @@ public class PurchaseController
 
     /**
      * POST method to create a new purchase order and return HTML invoice for it.
-     * @param orderRequest - form data containing supplier name and list of product names.
+     * @param productIds - form data containing supplier name and list of product names.
      * @return HttpEntity - HTTP response containing invoice in body and necessary headers.
      */
     @PostMapping("/purchase/create")
-    public ResponseEntity<String> createPurchaseOrder(@RequestBody PurchaseOrderRequest orderRequest)
+    public void createPurchaseOrder(@RequestBody ProductIds productIds)
     {
-        log.info("Creating purchase order for supplier: "+orderRequest.getSupplier());
-        Purchase purchase = createPurchaseRecord(orderRequest);
-        purchaseRepository.save(purchase);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "text/html");
+        Map<Supplier, Set<Product>> productsBySupplier = new HashMap<>();
+        for (int id : productIds.getIds())
+        {
+            Optional<Product> productOp = productRepository.findById(id);
+            addProductToMap(productsBySupplier, productOp);
+        }
+        createPurchaseOrdersAndInvoices(productsBySupplier);
 
-        return ResponseEntity.ok().headers(headers).body(reportsController.generatePurchaseInvoice(purchase));
+        log.info("All purchase orders created...");
     }
 
-    private Purchase createPurchaseRecord(@RequestBody PurchaseOrderRequest orderRequest)
+    private void addProductToMap(Map<Supplier, Set<Product>> productsBySupplier, Optional<Product> productOp)
+    {
+        if (productOp.isPresent())
+        {
+            Product product = productOp.get();
+            if (!productsBySupplier.containsKey(product.getSupplier()))
+            {
+                productsBySupplier.put(product.getSupplier(), new HashSet<>());
+                productsBySupplier.get(product.getSupplier()).add(product);
+            } else
+            {
+                productsBySupplier.get(product.getSupplier()).add(product);
+            }
+        }
+    }
+
+    private void createPurchaseOrdersAndInvoices(Map<Supplier, Set<Product>> productsBySupplier)
+    {
+        Date date = getDate();
+        for (Supplier supplier : productsBySupplier.keySet())
+        {
+            Purchase purchase = new Purchase(supplier, date, productsBySupplier.get(supplier));
+            purchaseRepository.save(purchase);
+            reportsController.generatePurchaseInvoice(purchase);
+        }
+    }
+
+    private Date getDate()
     {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDateTime now = LocalDateTime.now();
-        Date date = Date.valueOf(dtf.format(now));
-        Supplier supplier = supplierRepository.findByname(orderRequest.getSupplier());
-        Set<Product> products = orderRequest.getProducts().stream().map(productItem ->
-                productRepository.findByname(productItem.getValue())).collect(Collectors.toSet());
-
-        return new Purchase(supplier, date, products);
+        return Date.valueOf(dtf.format(now));
     }
-
 }

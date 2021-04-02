@@ -7,7 +7,9 @@
 package edu.finalyearproject.imsresourceserver.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -15,6 +17,8 @@ import javax.persistence.*;
 @Table(name = "suppliers")
 @Data
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@AllArgsConstructor
+@NoArgsConstructor
 public class Supplier
 {
     @Id

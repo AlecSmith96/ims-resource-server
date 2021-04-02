@@ -104,15 +104,15 @@ public class ProductController
         return productRepository.findBysupplier(supplier);
     }
 
-    /**
-     * Creates a new Product record and adds it to the database.
-     * @param product - The product details to add to the database.
-     */
-    @PostMapping("/products/{name}")
-    public void addProduct(@RequestBody Product product)
-    {
-        productRepository.save(product);
-    }
+//    /**
+//     * Creates a new Product record and adds it to the database.
+//     * @param product - The product details to add to the database.
+//     */
+//    @PostMapping("/products/{name}")
+//    public void addProduct(@RequestBody Product product)
+//    {
+//        productRepository.save(product);
+//    }
 
     @PostMapping("/products/sku/{id}")
     public void removeProduct(@PathVariable Integer id)
@@ -133,7 +133,7 @@ public class ProductController
     }
 
     @PostMapping("/product/add")
-    public void addProduct(@RequestBody NewProductRequest productRequest)
+    public Product addProduct(@RequestBody NewProductRequest productRequest)
     {
         log.info("Adding new product to database: "+ productRequest.getName());
         Supplier supplier = supplierRepository.findByname(productRequest.getSupplierName());
@@ -141,10 +141,12 @@ public class ProductController
                 productRequest.getInventoryOnHand(), productRequest.getReorderThreshold(),
                 productRequest.getReorderQuantity(), supplier);
         productRepository.save(newProduct);
+
+        return newProduct;
     }
 
     @PostMapping("/product/suspend/{id}")
-    public void suspendProduct(@PathVariable Integer id)
+    public Product suspendProduct(@PathVariable Integer id)
     {
         Optional<Product> productOptional = productRepository.findById(id);
 
@@ -153,11 +155,14 @@ public class ProductController
             Product product = productOptional.get();
             product.setSuspended(true);
             productRepository.save(product);
+            return product;
         }
+
+        return new Product();
     }
 
     @PostMapping("/product/reinstate/{id}")
-    public void reinstateProduct(@PathVariable Integer id)
+    public Product reinstateProduct(@PathVariable Integer id)
     {
         Optional<Product> productOptional = productRepository.findById(id);
 
@@ -166,7 +171,10 @@ public class ProductController
             Product product = productOptional.get();
             product.setSuspended(false);
             productRepository.save(product);
+            return product;
         }
+
+        return new Product();
     }
 
     /**

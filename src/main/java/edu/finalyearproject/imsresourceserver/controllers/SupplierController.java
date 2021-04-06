@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * REST controller for all requests relating to Supplier records.
+ */
 @RestController
 public class SupplierController
 {
@@ -34,6 +37,10 @@ public class SupplierController
     @Autowired
     private ProductRepository productRepository;
 
+    /**
+     * GET method for returning all Supplier orders in the database.
+     * @return List<Supplier> - List of all Supplier orders.
+     */
     @GetMapping("/suppliers/all")
     public List<Supplier> getSuppliers()
     {
@@ -51,6 +58,11 @@ public class SupplierController
         return suppliers.stream().map(Supplier::getName).collect(Collectors.toList());
     }
 
+    /**
+     * GET method for returning a Supplier order with the corresponding id.
+     * @param id - the id of the Supplier record.
+     * @return Supplier - the Supplier object.
+     */
     @GetMapping("/supplier/{id}")
     public Supplier getSupplier(@PathVariable int id)
     {
@@ -64,7 +76,9 @@ public class SupplierController
     }
 
     /**
-     * Get method to return all supplier purchase orders for supplier with corresponding id.
+     * GET method to return all purchase orders for supplier with corresponding id.
+     * @param id - the id of the Supplier record.
+     * @return List<Purchase> - List of Purchase orders for the supplier.
      */
     @GetMapping("/supplier/orders/{id}")
     public List<Purchase> getPurchaseOrdersForSupplier(@PathVariable int id)
@@ -78,6 +92,11 @@ public class SupplierController
         return new ArrayList<>();
     }
 
+    /**
+     * GET method to return the Supplier for a specific product.
+     * @param id - the id of the Product.
+     * @return Supplier - the Supplier for the product.
+     */
     @GetMapping("/supplier/product/{id}")
     public Supplier getSupplierForProduct(@PathVariable int id)
     {

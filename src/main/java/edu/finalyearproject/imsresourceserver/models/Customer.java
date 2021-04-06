@@ -16,6 +16,9 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import java.util.Set;
 
+/**
+ * Entity class representing a record in the Customer table of the database.
+ */
 @Entity
 @Table(name = "customers")
 @Data

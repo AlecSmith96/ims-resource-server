@@ -6,7 +6,6 @@
  */
 package edu.finalyearproject.imsresourceserver.controllers;
 
-import com.lowagie.text.DocumentException;
 import edu.finalyearproject.imsresourceserver.models.Order;
 import edu.finalyearproject.imsresourceserver.models.Product;
 import edu.finalyearproject.imsresourceserver.models.Purchase;
@@ -23,21 +22,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.sql.Date;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * REST controller for creating all HTML reports.
+ */
 @RestController
 public class ReportsController
 {
@@ -119,6 +116,11 @@ public class ReportsController
         return html;
     }
 
+    /**
+     * GET method for generating an invoice for a cystomer order.
+     * @param id - the id of the customer order to generate the invoice for.
+     * @return String - the html for the generated report.
+     */
     @GetMapping("/reports/order-invoice/{id}")
     public String generateOrderInvoice(@PathVariable int id)
     {
@@ -144,6 +146,11 @@ public class ReportsController
         return html;
     }
 
+    /**
+     * GET method for generating an invoice for a supplier purchase order.
+     * @param purchase - the Purchase record to generate the report for.
+     * @return String - the HTMl for the generated report.
+     */
     @GetMapping("/reports/supplier-invoice")
     public String generatePurchaseInvoice(@RequestBody Purchase purchase)
     {

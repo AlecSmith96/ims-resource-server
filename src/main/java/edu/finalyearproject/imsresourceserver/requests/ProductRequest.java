@@ -10,6 +10,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Wrapper class for adding a new Product.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

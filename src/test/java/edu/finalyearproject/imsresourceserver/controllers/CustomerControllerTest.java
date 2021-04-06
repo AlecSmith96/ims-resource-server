@@ -1,3 +1,9 @@
+/**
+ * Copyright (C) Alec R. C. Smith - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ * Written by Alec Smith <alec.smith@uea.ac.uk>, 2020-2021
+ */
 package edu.finalyearproject.imsresourceserver.controllers;
 
 import edu.finalyearproject.imsresourceserver.models.Address;
@@ -15,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)

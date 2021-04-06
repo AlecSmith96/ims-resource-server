@@ -19,6 +19,9 @@ import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Entity class representing a record in the Order table of the database.
+ */
 @Entity
 @Table(name = "orders")
 @Data

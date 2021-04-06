@@ -1,6 +1,11 @@
+/**
+ * Copyright (C) Alec R. C. Smith - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ * Written by Alec Smith <alec.smith@uea.ac.uk>, 2020-2021
+ */
 package edu.finalyearproject.imsresourceserver.reports;
 
-import edu.finalyearproject.imsresourceserver.controllers.ProductControllerTest;
 import edu.finalyearproject.imsresourceserver.models.*;
 import edu.finalyearproject.imsresourceserver.requests.StockMovement;
 import edu.finalyearproject.imsresourceserver.requests.WasteItem;
@@ -21,7 +26,6 @@ import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)

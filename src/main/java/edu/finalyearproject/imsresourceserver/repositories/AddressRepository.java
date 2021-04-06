@@ -9,6 +9,9 @@ package edu.finalyearproject.imsresourceserver.repositories;
 import edu.finalyearproject.imsresourceserver.models.Address;
 import org.springframework.data.repository.CrudRepository;
 
+/**
+ * JPA Repository to perform auto-generated queries on the Address table in the database.
+ */
 public interface AddressRepository extends CrudRepository<Address, Integer>
 {
     Address findByid(int address_id);

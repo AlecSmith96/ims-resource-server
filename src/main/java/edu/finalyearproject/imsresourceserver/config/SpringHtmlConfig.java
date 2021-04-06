@@ -24,6 +24,10 @@ public class SpringHtmlConfig
 {
     private static final String CHARACTER_ENCODING = "UTF-8";
 
+    /**
+     * Configuration method to set up template engine bean using by Thymeleaf for generating reports.
+     * @return TemplateEngine - Bean used to generate reports from templates.
+     */
     @Bean
     public TemplateEngine htmlTemplateEngine()
     {
@@ -32,6 +36,10 @@ public class SpringHtmlConfig
         return templateEngine;
     }
 
+    /**
+     * Configuration method used for resolving names and locations of HTML templates used for generating reports.
+     * @return ITemplateResolver - Bean used to resolve location of HTML templates.
+     */
     @Bean
     public ITemplateResolver htmlTemplateResolver()
     {

@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Optional;
 
+/**
+ * Rest Controller for all requests relating to Customer records.
+ */
 @RestController
 public class CustomerController
 {
@@ -26,12 +28,21 @@ public class CustomerController
 
     private Logger log = LoggerFactory.getLogger(CustomerController.class);
 
+    /**
+     * GET method for returning all customer records.
+     * @return List<Customer> - List of Customer objects.
+     */
     @GetMapping("/customers/all")
     public List<Customer> getCustomers()
     {
         return customerRepository.findAll();
     }
 
+    /**
+     * GET method for returning the Customer record relating to passed id parameter.
+     * @param id - the id of the Customer requested.
+     * @return Customer - the Customer object.
+     */
     @GetMapping("/customers/{id}")
     public Customer getCustomer(@PathVariable Integer id)
     {

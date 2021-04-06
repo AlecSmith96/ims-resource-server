@@ -14,6 +14,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * JPA Repository to perform auto-generated queries on the Order table in the database.
+ */
 @Repository
 public interface OrderRepository extends CrudRepository<Order, Integer>
 {

@@ -23,6 +23,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+/**
+ * REST controller for all requests relating to Purchase records.
+ */
 @RestController
 public class PurchaseController
 {
@@ -40,6 +43,10 @@ public class PurchaseController
 
     private Logger log = LoggerFactory.getLogger(PurchaseController.class);
 
+    /**
+     * GET method to return all Purchase records.
+     * @return List<Purchase> - List of all Purchase objects.
+     */
     @GetMapping("/purchases/all")
     public List<Purchase> getPurchases()
     {
@@ -48,6 +55,11 @@ public class PurchaseController
         return all;
     }
 
+    /**
+     * GET method for returning all Purchase records containing a certain Product.
+     * @param product_id - the id for the Product.
+     * @return List<Purchase> - List of Purchase objects containing this product.
+     */
     @GetMapping("/purchases/product/{product_id}")
     public List<Purchase> getPurchasesForProduct(@PathVariable int product_id)
     {
@@ -127,6 +139,7 @@ public class PurchaseController
         return productsBySupplier;
     }
 
+    // create a Map to split products by their supplier
     private void addProductToMap(Map<Supplier, Set<Product>> productsBySupplier, Optional<Product> productOp)
     {
         if (productOp.isPresent())
@@ -143,6 +156,7 @@ public class PurchaseController
         }
     }
 
+    // for each distinct supplier, create a new purchase order
     private void createPurchaseOrdersAndInvoices(Map<Supplier, Set<Product>> productsBySupplier)
     {
         Date date = getDate();
@@ -154,6 +168,7 @@ public class PurchaseController
         }
     }
 
+    // get todays date
     private Date getDate()
     {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");

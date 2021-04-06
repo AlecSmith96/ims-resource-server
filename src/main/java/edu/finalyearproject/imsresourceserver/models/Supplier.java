@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+/**
+ * Entity class representing a record in the Supplier table of the database.
+ */
 @Entity
 @Table(name = "suppliers")
 @Data

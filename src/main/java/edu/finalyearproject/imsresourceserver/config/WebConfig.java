@@ -12,12 +12,16 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * Config class for exposing all endpoints to any front-end application.
+ * Config class for exposing all endpoints to the ims-frontend application.
  */
 @Configuration
 @EnableWebMvc
 public class WebConfig implements WebMvcConfigurer
 {
+    /**
+     * Configuration method for allowing cross-origin requests.
+     * @param registry
+     */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")

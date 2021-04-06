@@ -8,6 +8,9 @@ package edu.finalyearproject.imsresourceserver.requests;
 
 import lombok.Data;
 
+/**
+ * Wrapper class for products in a customer order.
+ */
 @Data
 public class ProductItem
 {

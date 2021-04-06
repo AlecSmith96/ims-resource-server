@@ -17,6 +17,9 @@ import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Entity class representing a record in the Purchase table of the database.
+ */
 @Entity
 @Table(name = "purchases")
 @Data

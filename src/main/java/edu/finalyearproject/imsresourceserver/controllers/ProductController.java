@@ -20,7 +20,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -28,10 +27,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-
+/**
+ * REST controller for all requests relating to Product records.
+ */
 @RestController
 public class ProductController
 {
@@ -94,7 +94,7 @@ public class ProductController
 
     /**
      * Returns all products for a given supplier.
-     * @param name - the name of the supplier to find the products of
+     * @param name - the name of the supplier to find the products of.
      * @return List<Product> - List of all products provided by the supplier.
      */
     @GetMapping("/products/supplier/{name}")
@@ -104,22 +104,21 @@ public class ProductController
         return productRepository.findBysupplier(supplier);
     }
 
-//    /**
-//     * Creates a new Product record and adds it to the database.
-//     * @param product - The product details to add to the database.
-//     */
-//    @PostMapping("/products/{name}")
-//    public void addProduct(@RequestBody Product product)
-//    {
-//        productRepository.save(product);
-//    }
-
+    /**
+     * POST method to remove a product record.
+     * @param id - the id of the Product.
+     */
     @PostMapping("/products/sku/{id}")
     public void removeProduct(@PathVariable Integer id)
     {
         productRepository.deleteById(id);
     }
 
+    /**
+     * GET method to retrieve a Product record.
+     * @param id - the id of the Product.
+     * @return Product - The Product object.
+     */
     @GetMapping("/product/{id}")
     public Product getProduct(@PathVariable Integer id)
     {
@@ -132,6 +131,11 @@ public class ProductController
         return new Product();
     }
 
+    /**
+     * POST method to add Product record to the database.
+     * @param productRequest - Object containing products details.
+     * @return - the new Product object.
+     */
     @PostMapping("/product/add")
     public Product addProduct(@RequestBody NewProductRequest productRequest)
     {
@@ -145,6 +149,11 @@ public class ProductController
         return newProduct;
     }
 
+    /**
+     * POST method to set a product record as suspended.
+     * @param id - the id of the Product.
+     * @return Product - the Product that has been suspended.
+     */
     @PostMapping("/product/suspend/{id}")
     public Product suspendProduct(@PathVariable Integer id)
     {
@@ -161,6 +170,11 @@ public class ProductController
         return new Product();
     }
 
+    /**
+     * POST method to set a product record as not suspended.
+     * @param id - the id of the Product.
+     * @return Product - the Product that has been reinstated.
+     */
     @PostMapping("/product/reinstate/{id}")
     public Product reinstateProduct(@PathVariable Integer id)
     {
@@ -190,6 +204,12 @@ public class ProductController
                                                     (product.getReorder_threshold() +20)).collect(Collectors.toList());
     }
 
+    /**
+     * POST method to update the reorder_threshold for a Product.
+     * @param id - the id of the product.
+     * @param request - wrapper class containing new threshold.
+     * @return Product - the Product with the updated threshold.
+     */
     @PostMapping("/product/update/reorder-threshold/{id}")
     public Product updateReorderThreshold(@PathVariable int id, @RequestBody ProductThresholdRequest request)
     {
@@ -206,6 +226,12 @@ public class ProductController
         return new Product();
     }
 
+    /**
+     * POST method for updating the reorder_amount for a Product.
+     * @param id - the id of the Product.
+     * @param request - wrapper class containing new amount.
+     * @return Product - the Product with the updated reorder_amount.
+     */
     @PostMapping("/product/update/reorder-amount/{id}")
     public Product updateReorderAmount(@PathVariable int id, @RequestBody ProductAmountRequest request)
     {
@@ -222,6 +248,11 @@ public class ProductController
         return new Product();
     }
 
+    /**
+     * GET method for calculating and returning the average daily sales for a Product.
+     * @param id - the id of the Product.
+     * @return float - the average daily sales for the product.
+     */
     @GetMapping("/product/adu/{id}")
     public float getAverageDailySales(@PathVariable int id)
     {
@@ -239,6 +270,7 @@ public class ProductController
         return (float) (totalSales / 14.0);
     }
 
+    // add together total sales for orders in range
     private int getTotalSales(@PathVariable int id, List<Order> ordersInRange)
     {
         int totalSales = 0;
@@ -255,6 +287,7 @@ public class ProductController
         return totalSales;
     }
 
+    // calculate the date two weeks before today's date
     private Date getDateTwoWeeksBefore(Date today)
     {
         Calendar calendar = Calendar.getInstance();

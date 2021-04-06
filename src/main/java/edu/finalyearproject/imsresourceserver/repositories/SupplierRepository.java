@@ -11,6 +11,9 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
+/**
+ * JPA Repository to perform auto-generated queries on the Supplier table in the database.
+ */
 public interface SupplierRepository extends CrudRepository<Supplier, Integer>
 {
     List<Supplier> findAll();

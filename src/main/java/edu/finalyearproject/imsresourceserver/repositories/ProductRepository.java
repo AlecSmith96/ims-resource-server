@@ -14,6 +14,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * JPA Repository to perform auto-generated queries on the Product table in the database.
+ */
 @Repository
 public interface ProductRepository extends CrudRepository<Product, Integer>
 {

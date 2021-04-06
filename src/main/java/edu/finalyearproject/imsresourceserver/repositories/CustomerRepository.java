@@ -12,6 +12,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+/**
+ * JPA Repository to perform auto-generated queries on the Customer table in the database.
+ */
 @Repository
 public interface CustomerRepository extends CrudRepository<Customer, Integer>
 {

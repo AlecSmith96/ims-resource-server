@@ -6,7 +6,9 @@
  */
 package edu.finalyearproject.imsresourceserver.controllers;
 
-import edu.finalyearproject.imsresourceserver.models.*;
+import edu.finalyearproject.imsresourceserver.models.Customer;
+import edu.finalyearproject.imsresourceserver.models.Order;
+import edu.finalyearproject.imsresourceserver.models.Product;
 import edu.finalyearproject.imsresourceserver.repositories.CustomerRepository;
 import edu.finalyearproject.imsresourceserver.repositories.OrderRepository;
 import edu.finalyearproject.imsresourceserver.repositories.ProductRepository;
@@ -16,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.condition.ProducesRequestCondition;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
@@ -24,6 +25,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * REST controller for all requests relating to Order records.
+ */
 @RestController
 public class OrderController
 {
@@ -70,38 +74,6 @@ public class OrderController
         return order;
     }
 
-    // NOT USED CURRENTLY //////////////////////////////////////////////////////////////////////////////////////////////
-//    /**
-//     * Method that returns all orders in format that can be used in the table of the 'Customer Orders' page.
-//     * @return List<OrderPageOrders> - All orders in correct format for order table
-//     */
-//    @GetMapping("/orders/homepage")
-//    public List<OrderPageOrder> getOrdersForHomepage()
-//    {
-//        List<Order> all = orderRepository.findAll();
-//        List<OrderPageOrder> ordersForCustomerOrdersPage = new ArrayList<>();
-//        for (Order order : all)
-//        {
-//            OrderPageOrder newOrder = formatOrder(order);
-//            ordersForCustomerOrdersPage.add(newOrder);
-//        }
-//
-//        return ordersForCustomerOrdersPage;
-//    }
-//
-//    private OrderPageOrder formatOrder(Order order)
-//    {
-//        OrderPageOrder newOrder = new OrderPageOrder();
-//        newOrder.setId(order.getId().toString());
-//        newOrder.setCustomer(order.getCustomer().getTitle()+" "+
-//                order.getCustomer().getFirst_name()+" "+
-//                order.getCustomer().getLast_name());
-//        newOrder.setOrder_date(order.getOrder_date().toString());
-//        newOrder.setArrival_date(order.getArrival_date() == null ? "null" : order.getArrival_date().toString());
-//
-//        return newOrder;
-//    }
-
     /**
      * GET method for returning all orders containing a specific product.
      * @param product_id - the id(primary key) of the product.
@@ -120,6 +92,11 @@ public class OrderController
         return new ArrayList<>();
     }
 
+    /**
+     * GET method for returning all Orders ordered by a customer.
+     * @param customer_id - the id of the customer.
+     * @return List<Order> - List of the customer's orders.
+     */
     @GetMapping("/customer/{customer_id}")
     public List<Order> getOrdersForCustomer(@PathVariable  int customer_id)
     {
@@ -130,6 +107,11 @@ public class OrderController
                 .collect(Collectors.toList())).orElseGet(ArrayList::new);
     }
 
+    /**
+     * POST method for creating a new Customer order.
+     * @param orderRequest - object with customer_id and ProductRequest objects.
+     * @return Order - the new Customer Order record.
+     */
     @PostMapping("/order/create")
     public Order createNewOrder(@RequestBody OrderRequest orderRequest)
     {

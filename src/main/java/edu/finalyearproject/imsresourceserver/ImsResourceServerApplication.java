@@ -17,7 +17,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @EnableResourceServer
 public class ImsResourceServerApplication
 {
-
     public static void main(String[] args)
     {
         SpringApplication.run(ImsResourceServerApplication.class, args);

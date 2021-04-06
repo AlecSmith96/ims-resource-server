@@ -21,10 +21,18 @@ import org.springframework.web.filter.CorsFilter;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Configuration class that sets up the Resource Server OAuth Security settings.
+ */
 @Configuration
 @EnableWebSecurity
 public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter
 {
+    /**
+     * WebSecurity method used to configure securitu for HTTP requests received by the application.
+     * @param http - config class for HTTP requests
+     * @throws Exception
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception
     {
@@ -39,8 +47,13 @@ public class OAuthSecurityConfig extends WebSecurityConfigurerAdapter
         .csrf().disable();
     }
 
+    // Allow origin for ims-frontend application:
     public static final List<String> allowedOrigins = Arrays.asList("http://localhost:3000");
 
+    /**
+     * Configration method for setting the CORS filter.
+     * @return - the CORS filter.
+     */
     @Bean
     public FilterRegistrationBean<CorsFilter> initCorsFilter() {
         // @formatter:off

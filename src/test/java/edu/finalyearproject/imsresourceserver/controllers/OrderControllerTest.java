@@ -1,3 +1,9 @@
+/**
+ * Copyright (C) Alec R. C. Smith - All Rights Reserved
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ * Written by Alec Smith <alec.smith@uea.ac.uk>, 2020-2021
+ */
 package edu.finalyearproject.imsresourceserver.controllers;
 
 import edu.finalyearproject.imsresourceserver.models.*;
@@ -7,7 +13,6 @@ import edu.finalyearproject.imsresourceserver.repositories.ProductRepository;
 import edu.finalyearproject.imsresourceserver.requests.OrderRequest;
 import edu.finalyearproject.imsresourceserver.requests.ProductRequest;
 import org.junit.Before;
-import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -20,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)

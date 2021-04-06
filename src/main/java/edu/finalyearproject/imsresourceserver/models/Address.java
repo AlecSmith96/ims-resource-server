@@ -10,6 +10,9 @@ import lombok.Data;
 
 import javax.persistence.*;
 
+/**
+ * Entity class representing a record in the Address table of the database.
+ */
 @Entity
 @Table(name = "addresses")
 @Data

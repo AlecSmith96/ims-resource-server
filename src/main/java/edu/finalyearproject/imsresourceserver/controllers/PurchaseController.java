@@ -13,19 +13,15 @@ import edu.finalyearproject.imsresourceserver.repositories.ProductRepository;
 import edu.finalyearproject.imsresourceserver.repositories.PurchaseRepository;
 import edu.finalyearproject.imsresourceserver.repositories.SupplierRepository;
 import edu.finalyearproject.imsresourceserver.requests.ProductIds;
-import edu.finalyearproject.imsresourceserver.requests.PurchaseOrderRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 public class PurchaseController
@@ -53,7 +49,7 @@ public class PurchaseController
     }
 
     @GetMapping("/purchases/product/{product_id}")
-    public List<Purchase> getPurchasesForProduct(@PathVariable int product_id) throws Exception
+    public List<Purchase> getPurchasesForProduct(@PathVariable int product_id)
     {
         log.info("Searching for purchase orders by product...");
         Optional<Product> product = productRepository.findById(product_id);
@@ -61,7 +57,7 @@ public class PurchaseController
         {
             return purchaseRepository.findByproducts(product.get());
         }
-        throw new Exception("Unrecognised Product");
+        return new ArrayList<>();
     }
 
     /**
@@ -70,7 +66,7 @@ public class PurchaseController
      * @return void
      */
     @PostMapping("/purchase/delivered/{id}")
-    public void setOrderToDelivered(@PathVariable int id)
+    public Purchase setOrderToDelivered(@PathVariable int id)
     {
         log.info("Setting purchase order " + id + " to delivered..");
         Date date = getDate();
@@ -86,6 +82,7 @@ public class PurchaseController
         });
 
         purchaseRepository.save(purchase);
+        return purchase;
     }
 
     /**
@@ -93,9 +90,9 @@ public class PurchaseController
      * @param id - the id of the purchase order to be reordered.
      */
     @PostMapping("/purchase/reorder/{id}")
-    public void reorderPurchaseOrder(@PathVariable Integer id)
+    public Purchase reorderPurchaseOrder(@PathVariable Integer id)
     {
-        log.info("Reording products from supplier order #"+id);
+        log.info("Reordering products from supplier order #"+id);
         Optional<Purchase> purchase = purchaseRepository.findById(id);
         if (purchase.isPresent())
         {
@@ -105,7 +102,9 @@ public class PurchaseController
             Purchase newPurchase = new Purchase(purchase.get().getSupplier(), Date.valueOf(dtf.format(now)), products);
 
             purchaseRepository.save(newPurchase);
+            return newPurchase;
         }
+        return new Purchase();
     }
 
     /**
@@ -114,7 +113,7 @@ public class PurchaseController
      * @return HttpEntity - HTTP response containing invoice in body and necessary headers.
      */
     @PostMapping("/purchase/create")
-    public void createPurchaseOrder(@RequestBody ProductIds productIds)
+    public Map<Supplier, Set<Product>> createPurchaseOrder(@RequestBody ProductIds productIds)
     {
         Map<Supplier, Set<Product>> productsBySupplier = new HashMap<>();
         for (int id : productIds.getIds())
@@ -125,6 +124,7 @@ public class PurchaseController
         createPurchaseOrdersAndInvoices(productsBySupplier);
 
         log.info("All purchase orders created...");
+        return productsBySupplier;
     }
 
     private void addProductToMap(Map<Supplier, Set<Product>> productsBySupplier, Optional<Product> productOp)

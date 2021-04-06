@@ -8,6 +8,7 @@ package edu.finalyearproject.imsresourceserver.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -19,6 +20,7 @@ import java.util.Set;
 @Entity
 @Table(name = "purchases")
 @Data
+@AllArgsConstructor
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Purchase implements Comparable<Purchase>
 {

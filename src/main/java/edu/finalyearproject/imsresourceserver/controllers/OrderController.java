@@ -57,7 +57,7 @@ public class OrderController
      * @return void
      */
     @PostMapping("/order/delivered/{id}")
-    public void setOrderToDelivered(@PathVariable int id)
+    public Order setOrderToDelivered(@PathVariable int id)
     {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDateTime now = LocalDateTime.now();
@@ -66,39 +66,41 @@ public class OrderController
         Order order = orderRepository.findByid(id);
         order.setArrival_date(date);
         orderRepository.save(order);
+
+        return order;
     }
 
     // NOT USED CURRENTLY //////////////////////////////////////////////////////////////////////////////////////////////
-    /**
-     * Method that returns all orders in format that can be used in the table of the 'Customer Orders' page.
-     * @return List<OrderPageOrders> - All orders in correct format for order table
-     */
-    @GetMapping("/orders/homepage")
-    public List<OrderPageOrder> getOrdersForHomepage()
-    {
-        List<Order> all = orderRepository.findAll();
-        List<OrderPageOrder> ordersForCustomerOrdersPage = new ArrayList<>();
-        for (Order order : all)
-        {
-            OrderPageOrder newOrder = formatOrder(order);
-            ordersForCustomerOrdersPage.add(newOrder);
-        }
-
-        return ordersForCustomerOrdersPage;
-    }
-
-    private OrderPageOrder formatOrder(Order order)
-    {
-        OrderPageOrder newOrder = new OrderPageOrder();
-        newOrder.setId(order.getId().toString());
-        newOrder.setCustomer(order.getCustomer().getTitle()+" "+
-                order.getCustomer().getFirst_name()+" "+
-                order.getCustomer().getLast_name());
-        newOrder.setOrder_date(order.getOrder_date().toString());
-        newOrder.setArrival_date(order.getArrival_date() == null ? "null" : order.getArrival_date().toString());
-
-        return newOrder;
-    }
+//    /**
+//     * Method that returns all orders in format that can be used in the table of the 'Customer Orders' page.
+//     * @return List<OrderPageOrders> - All orders in correct format for order table
+//     */
+//    @GetMapping("/orders/homepage")
+//    public List<OrderPageOrder> getOrdersForHomepage()
+//    {
+//        List<Order> all = orderRepository.findAll();
+//        List<OrderPageOrder> ordersForCustomerOrdersPage = new ArrayList<>();
+//        for (Order order : all)
+//        {
+//            OrderPageOrder newOrder = formatOrder(order);
+//            ordersForCustomerOrdersPage.add(newOrder);
+//        }
+//
+//        return ordersForCustomerOrdersPage;
+//    }
+//
+//    private OrderPageOrder formatOrder(Order order)
+//    {
+//        OrderPageOrder newOrder = new OrderPageOrder();
+//        newOrder.setId(order.getId().toString());
+//        newOrder.setCustomer(order.getCustomer().getTitle()+" "+
+//                order.getCustomer().getFirst_name()+" "+
+//                order.getCustomer().getLast_name());
+//        newOrder.setOrder_date(order.getOrder_date().toString());
+//        newOrder.setArrival_date(order.getArrival_date() == null ? "null" : order.getArrival_date().toString());
+//
+//        return newOrder;
+//    }
 
     /**
      * GET method for returning all orders containing a specific product.
@@ -107,7 +109,7 @@ public class OrderController
      * @throws Exception - If the product isn't found in the product repository.
      */
     @GetMapping("/orders/product/{product_id}")
-    public List<Order> getOrdersForProduct(@PathVariable int product_id) throws Exception
+    public List<Order> getOrdersForProduct(@PathVariable int product_id)
     {
         log.info("Searching for orders by product...");
         Optional<Product> product = productRepository.findById(product_id);
@@ -115,7 +117,7 @@ public class OrderController
         {
             return orderRepository.findByproducts(product.get());
         }
-        throw new Exception("Unrecognised Product");
+        return new ArrayList<>();
     }
 
     @GetMapping("/customer/{customer_id}")
@@ -123,17 +125,13 @@ public class OrderController
     {
         Optional<Customer> customer = customerRepository.findById(customer_id);
         List<Order> allOrders = orderRepository.findAll();
-        if (customer.isPresent())
-        {
-            return allOrders.stream().filter(order -> order.getCustomer().equals(customer.get()))
-                                                                         .collect(Collectors.toList());
-        }
 
-        return new ArrayList<>();
+        return customer.map(value -> allOrders.stream().filter(order -> order.getCustomer().equals(value))
+                .collect(Collectors.toList())).orElseGet(ArrayList::new);
     }
 
     @PostMapping("/order/create")
-    public void createNewOrder(@RequestBody OrderRequest orderRequest)
+    public Order createNewOrder(@RequestBody OrderRequest orderRequest)
     {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDateTime now = LocalDateTime.now();
@@ -149,7 +147,6 @@ public class OrderController
             }
         }
 
-
         Order order = new Order();
         order.setCustomer(customer.get());
         order.setProducts(products);
@@ -158,6 +155,7 @@ public class OrderController
         // UPDATE product quantities
 
         orderRepository.save(order);
+        return order;
     }
 }
 

@@ -53,6 +53,7 @@ public class SupplierControllerTest
     private Supplier getSupplierResult;
     private List<Purchase> getPurchaseOrdersForSupplierResult;
     private Supplier getSupplierForProductResult;
+    private List<Product> getProductsForSupplierResult;
 
     private Fixture fixture;
 
@@ -127,6 +128,24 @@ public class SupplierControllerTest
         fixture.thenAssertEmptySupplierIsReturned(getSupplierForProductResult);
     }
 
+    @Test
+    public void getProductsForSupplier_returnsProducts()
+    {
+        fixture.givenSupplierRepositoryReturnsOptionalWithSupplier();
+        fixture.givenProductRepositoryReturnsMultipleProducts();
+        fixture.whenGetProductsForSupplierIsCalled();
+        fixture.thenAssertProductsAreReturned();
+    }
+
+    @Test
+    public void getProductsForSupplier_returnsEmptyArrayList()
+    {
+        fixture.givenSupplierRepositoryReturnsEmptyOptional();
+        fixture.givenProductRepositoryReturnsEmptyOptional();
+        fixture.whenGetProductsForSupplierIsCalled();
+        fixture.thenAssertEmptyArrayListOfProductsIsReturned();
+    }
+
     private static List<Supplier> getSuppliers()
     {
         List<Supplier> suppliers = new ArrayList<>();
@@ -179,6 +198,15 @@ public class SupplierControllerTest
             when(productRepository.findById(1)).thenReturn(Optional.empty());
         }
 
+        void givenProductRepositoryReturnsMultipleProducts()
+        {
+            List<Product> products = new ArrayList<>();
+            products.add(new Product("product1", 11111111, (float) 5.0, 10, 5, 2, SUPPLIER));
+            products.add(new Product("product2", 22222222, (float) 5.0, 10, 5, 2, SUPPLIER));
+            products.add(new Product("product3", 33333333, (float) 5.0, 10, 5, 2, SUPPLIER));
+            when(productRepository.findBysupplier(SUPPLIER)).thenReturn(products);
+        }
+
         void whenGetSuppliersIsCalled()
         {
             getSuppliersResult = target.getSuppliers();
@@ -202,6 +230,11 @@ public class SupplierControllerTest
         void whenGetSupplierForProductIsCalled()
         {
             getSupplierForProductResult = target.getSupplierForProduct(1);
+        }
+
+        void whenGetProductsForSupplierIsCalled()
+        {
+            getProductsForSupplierResult = target.getProductsForSupplier(1);
         }
 
         void thenAssertSuppliersAreReturned()
@@ -241,6 +274,19 @@ public class SupplierControllerTest
         void thenAssertCorrectSupplierIsReturned()
         {
             assertEquals(SUPPLIER, getSupplierForProductResult);
+        }
+
+        void thenAssertProductsAreReturned()
+        {
+            assertEquals(3, getProductsForSupplierResult.size());
+            assertEquals("product1", getProductsForSupplierResult.get(0).getName());
+            assertEquals("product2", getProductsForSupplierResult.get(1).getName());
+            assertEquals("product3", getProductsForSupplierResult.get(2).getName());
+        }
+
+        void thenAssertEmptyArrayListOfProductsIsReturned()
+        {
+            assertEquals(0, getProductsForSupplierResult.size());
         }
     }
 }

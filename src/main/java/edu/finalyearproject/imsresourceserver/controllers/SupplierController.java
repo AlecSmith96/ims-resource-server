@@ -108,4 +108,22 @@ public class SupplierController
 
         return new Supplier();
     }
+
+    /**
+     * GET method for returning all products for a given supplier.
+     * @param id - the id of the supplier.
+     * @return List<Product> - all products for this supplier.
+     */
+    @GetMapping("/supplier/products/{id}")
+    public List<Product> getProductsForSupplier(@PathVariable int id)
+    {
+        Optional<Supplier> byId = supplierRepository.findById(id);
+        if (byId.isPresent())
+        {
+            List<Product> products = productRepository.findBysupplier(byId.get());
+            return products;
+        }
+
+        return new ArrayList<>();
+    }
 }
